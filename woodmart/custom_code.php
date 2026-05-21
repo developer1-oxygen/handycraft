@@ -8,6 +8,298 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * Disable Woodmart promo popup (black overlay / empty modal on first visit).
+ */
+add_filter(
+	'woodmart_global_options',
+	function ( $options ) {
+		if ( is_array( $options ) ) {
+			$options['promo_popup'] = false;
+		}
+		return $options;
+	},
+	999
+);
+
+add_action(
+	'after_setup_theme',
+	function () {
+		remove_action( 'woodmart_after_footer', 'woodmart_promo_popup', 200 );
+	},
+	20
+);
+
+add_action(
+	'wp_enqueue_scripts',
+	function () {
+		wp_add_inline_script(
+			'woodmart-theme',
+			"if (typeof woodmart_settings !== 'undefined') { woodmart_settings.enable_popup = 'no'; }",
+			'after'
+		);
+	},
+	10001
+);
+
+/**
+ * Format sale/regular prices for custom product cards (uses WooCommerce INR formatting when available).
+ *
+ * @param float $regular_price Regular price amount.
+ * @param float $sale_price    Sale price amount.
+ * @return string
+ */
+function wd_format_sale_price_html( $regular_price, $sale_price ) {
+	$regular_price = (float) $regular_price;
+	$sale_price    = (float) $sale_price;
+
+	if ( function_exists( 'wc_price' ) ) {
+		return '<del>' . wc_price( $regular_price ) . '</del> <span class="wd-price-current">' . wc_price( $sale_price ) . '</span>';
+	}
+
+	$formatted_regular = '₹' . number_format_i18n( $regular_price, 0 );
+	$formatted_sale    = '₹' . number_format_i18n( $sale_price, 0 );
+
+	return '<del>' . esc_html( $formatted_regular ) . '</del> <span class="wd-price-current">' . esc_html( $formatted_sale ) . '</span>';
+}
+
+/**
+ * Ensure Indian Rupee symbol is used when store currency is INR.
+ */
+add_filter(
+	'woocommerce_currency_symbol',
+	function ( $currency_symbol, $currency ) {
+		if ( 'INR' === $currency ) {
+			return '₹';
+		}
+		return $currency_symbol;
+	},
+	10,
+	2
+);
+
+/**
+ * Last name visible but optional — empty allowed (classic + Blocks + Store API).
+ */
+function wd_make_last_name_optional( $field ) {
+	$field['required'] = false;
+	$field['validate'] = array();
+	if ( ! empty( $field['class'] ) && is_array( $field['class'] ) ) {
+		$field['class'] = array_diff( $field['class'], array( 'validate-required' ) );
+	}
+	return $field;
+}
+
+function wd_fill_empty_checkout_last_names( $data ) {
+	if ( ! is_array( $data ) ) {
+		return $data;
+	}
+	foreach ( array( 'billing', 'shipping' ) as $type ) {
+		$last_key  = $type . '_last_name';
+		$first_key = $type . '_first_name';
+		if ( empty( trim( (string) ( $data[ $last_key ] ?? '' ) ) ) ) {
+			$first = trim( (string) ( $data[ $first_key ] ?? '' ) );
+			$data[ $last_key ] = $first ? $first : '-';
+		}
+	}
+	return $data;
+}
+
+add_filter(
+	'woocommerce_default_address_fields',
+	function ( $fields ) {
+		if ( isset( $fields['last_name'] ) ) {
+			$fields['last_name'] = wd_make_last_name_optional( $fields['last_name'] );
+		}
+		return $fields;
+	},
+	999
+);
+
+add_filter(
+	'woocommerce_get_country_locale_default',
+	function ( $fields ) {
+		if ( isset( $fields['last_name'] ) ) {
+			$fields['last_name'] = wd_make_last_name_optional( $fields['last_name'] );
+		}
+		return $fields;
+	},
+	999
+);
+
+add_filter(
+	'woocommerce_get_country_locale',
+	function ( $locale ) {
+		foreach ( $locale as $country => $fields ) {
+			$locale[ $country ]['last_name']['required'] = false;
+			unset( $locale[ $country ]['last_name']['hidden'] );
+		}
+		return $locale;
+	},
+	999
+);
+
+add_filter(
+	'woocommerce_checkout_fields',
+	function ( $fields ) {
+		foreach ( array( 'billing', 'shipping' ) as $section ) {
+			$key = $section . '_last_name';
+			if ( ! empty( $fields[ $section ][ $key ] ) ) {
+				$fields[ $section ][ $key ] = wd_make_last_name_optional( $fields[ $section ][ $key ] );
+			}
+		}
+		return $fields;
+	},
+	999
+);
+
+add_filter( 'woocommerce_checkout_posted_data', 'wd_fill_empty_checkout_last_names', 999 );
+
+add_filter(
+	'woocommerce_blocks_validate_location_address_fields',
+	function ( $errors ) {
+		foreach ( array_keys( $errors ) as $key ) {
+			if ( false !== strpos( (string) $key, 'last_name' ) ) {
+				unset( $errors[ $key ] );
+			}
+		}
+		return $errors;
+	},
+	999,
+	3
+);
+
+add_action(
+	'woocommerce_after_checkout_validation',
+	function ( $data, $errors ) {
+		if ( ! is_wp_error( $errors ) ) {
+			return;
+		}
+		foreach ( $errors->get_error_codes() as $code ) {
+			if ( false !== strpos( $code, 'last_name' ) ) {
+				$errors->remove( $code );
+				continue;
+			}
+			foreach ( $errors->get_error_messages( $code ) as $message ) {
+				if ( false !== stripos( $message, 'last name' ) ) {
+					$errors->remove( $code );
+					break;
+				}
+			}
+		}
+	},
+	999,
+	2
+);
+
+/**
+ * Blocks checkout: auto-fill empty last name before Store API request (client-side).
+ */
+function wd_checkout_optional_last_name_script() {
+	if ( ! function_exists( 'is_checkout' ) || ! is_checkout() ) {
+		return;
+	}
+	?>
+	<script id="wd-optional-last-name-checkout">
+	(function () {
+		function lastNameInputs() {
+			return document.querySelectorAll(
+				'#shipping-last_name, #billing-last_name, input[id*="last_name"], input[name="shipping_last_name"], input[name="billing_last_name"]'
+			);
+		}
+
+		function firstNameFor(input) {
+			var isBilling = (input.id || '').indexOf('billing') !== -1 || (input.name || '').indexOf('billing') !== -1;
+			var section = isBilling ? 'billing' : 'shipping';
+			var first = document.querySelector('#' + section + '-first_name, input[name="' + section + '_first_name"]');
+			return first && first.value ? String(first.value).trim() : '';
+		}
+
+		function relaxLastNameInputs() {
+			lastNameInputs().forEach(function (input) {
+				input.required = false;
+				input.removeAttribute('aria-required');
+				input.removeAttribute('pattern');
+			});
+		}
+
+		function fillEmptyLastNames() {
+			lastNameInputs().forEach(function (input) {
+				if (!input || String(input.value || '').trim()) {
+					return;
+				}
+				input.value = firstNameFor(input) || '-';
+				input.dispatchEvent(new Event('input', { bubbles: true }));
+				input.dispatchEvent(new Event('change', { bubbles: true }));
+			});
+		}
+
+		function clearLastNameErrors() {
+			document.querySelectorAll('.wc-block-components-validation-error, [role="alert"], .woocommerce-error li').forEach(function (el) {
+				if (/last name/i.test(el.textContent || '')) {
+					el.remove();
+				}
+			});
+			lastNameInputs().forEach(function (input) {
+				input.setAttribute('aria-invalid', 'false');
+				var row = input.closest('.wc-block-components-text-input, .form-row');
+				if (row) {
+					row.classList.remove('has-error', 'woocommerce-invalid', 'woocommerce-invalid-required-field');
+				}
+			});
+		}
+
+		function patchStoreFetch() {
+			if (window.__wdLastNameFetchPatched) {
+				return;
+			}
+			window.__wdLastNameFetchPatched = true;
+			var nativeFetch = window.fetch;
+			window.fetch = function (url, options) {
+				if (typeof url === 'string' && url.indexOf('/wc/store/') !== -1 && options && typeof options.body === 'string') {
+					try {
+						var body = JSON.parse(options.body);
+						['billing_address', 'shipping_address'].forEach(function (key) {
+							if (!body[key]) {
+								return;
+							}
+							if (!String(body[key].last_name || '').trim()) {
+								var fn = String(body[key].first_name || '').trim();
+								body[key].last_name = fn || '-';
+							}
+						});
+						options = Object.assign({}, options, { body: JSON.stringify(body) });
+					} catch (e) {}
+				}
+				return nativeFetch.call(this, url, options);
+			};
+		}
+
+		patchStoreFetch();
+		relaxLastNameInputs();
+		clearLastNameErrors();
+
+		document.addEventListener('click', function (e) {
+			if (!e.target.closest('.wc-block-components-checkout-place-order-button, #place_order, button[name="woocommerce_checkout_place_order"]')) {
+				return;
+			}
+			fillEmptyLastNames();
+			clearLastNameErrors();
+		}, true);
+
+		var root = document.querySelector('.wc-block-checkout, form.checkout');
+		if (root) {
+			new MutationObserver(function () {
+				relaxLastNameInputs();
+				clearLastNameErrors();
+			}).observe(root, { childList: true, subtree: true });
+		}
+	})();
+	</script>
+	<?php
+}
+add_action( 'wp_footer', 'wd_checkout_optional_last_name_script', 999 );
+
+/**
  * Check whether a product belongs to "Frame" category tree.
  *
  * Matches by slug/name and also supports child categories of Frame.
@@ -59,6 +351,373 @@ function wd_is_frame_product( $product_id ) {
 
 	return false;
 }
+
+/**
+ * Whether product needs a customer photo upload (Customized Gifts, etc.).
+ * Frame products use the visualizer instead.
+ *
+ * @param int $product_id Product ID.
+ * @return bool
+ */
+function wd_requires_custom_photo( $product_id ) {
+	$product_id = (int) $product_id;
+
+	if ( $product_id <= 0 || wd_is_frame_product( $product_id ) ) {
+		return false;
+	}
+
+	$meta = get_post_meta( $product_id, '_wd_requires_custom_photo', true );
+	if ( 'yes' === $meta ) {
+		return true;
+	}
+	if ( 'no' === $meta ) {
+		return false;
+	}
+
+	$category_keys = array( 'customized-gifts', 'customized gifts', 'customized_gifts' );
+	$terms         = get_the_terms( $product_id, 'product_cat' );
+
+	if ( is_wp_error( $terms ) || empty( $terms ) ) {
+		return false;
+	}
+
+	foreach ( $terms as $term ) {
+		$term_slug = strtolower( (string) $term->slug );
+		$term_name = strtolower( (string) $term->name );
+
+		if ( in_array( $term_slug, $category_keys, true ) || in_array( $term_name, $category_keys, true ) ) {
+			return true;
+		}
+
+		$ancestors = get_ancestors( (int) $term->term_id, 'product_cat' );
+		foreach ( $ancestors as $ancestor_id ) {
+			$ancestor = get_term( (int) $ancestor_id, 'product_cat' );
+			if ( ! $ancestor || is_wp_error( $ancestor ) ) {
+				continue;
+			}
+
+			$ancestor_slug = strtolower( (string) $ancestor->slug );
+			$ancestor_name = strtolower( (string) $ancestor->name );
+
+			if ( in_array( $ancestor_slug, $category_keys, true ) || in_array( $ancestor_name, $category_keys, true ) ) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+/**
+ * Product admin: require custom photo upload on the storefront.
+ */
+function wd_add_custom_photo_product_field() {
+	global $post;
+
+	$product_id = $post ? (int) $post->ID : 0;
+	if ( $product_id <= 0 ) {
+		return;
+	}
+
+	$value = get_post_meta( $product_id, '_wd_requires_custom_photo', true );
+	if ( '' === $value ) {
+		$value = wd_requires_custom_photo( $product_id ) ? 'yes' : 'no';
+	}
+
+	woocommerce_wp_checkbox(
+		array(
+			'id'          => '_wd_requires_custom_photo',
+			'label'       => __( 'Require custom photo upload', 'woodmart' ),
+			'description' => __( 'Show upload field on product page (used for Customized Gifts).', 'woodmart' ),
+			'value'       => 'yes' === $value ? 'yes' : 'no',
+		)
+	);
+}
+add_action( 'woocommerce_product_options_general_product_data', 'wd_add_custom_photo_product_field' );
+
+/**
+ * Save custom photo requirement checkbox.
+ *
+ * @param WC_Product $product Product object.
+ */
+function wd_save_custom_photo_product_field( $product ) {
+	if ( ! $product || ! is_a( $product, 'WC_Product' ) ) {
+		return;
+	}
+
+	$requires = isset( $_POST['_wd_requires_custom_photo'] ) ? 'yes' : 'no';
+	$product->update_meta_data( '_wd_requires_custom_photo', $requires );
+}
+add_action( 'woocommerce_admin_process_product_object', 'wd_save_custom_photo_product_field' );
+
+/**
+ * Upload field on single product add-to-cart form.
+ */
+function wd_render_custom_photo_upload_field() {
+	global $product;
+
+	if ( ! $product || ! is_a( $product, 'WC_Product' ) ) {
+		return;
+	}
+
+	$product_id = $product->get_id();
+	if ( ! wd_requires_custom_photo( $product_id ) ) {
+		return;
+	}
+
+	$ajax_url = admin_url( 'admin-ajax.php' );
+	?>
+	<div class="wd-custom-photo-upload" id="wd-custom-photo-upload" data-ajax-url="<?php echo esc_url( $ajax_url ); ?>">
+		<p class="wd-custom-photo-upload__label">
+			<strong><?php esc_html_e( 'Upload your photo', 'woodmart' ); ?></strong>
+			<span class="required">*</span>
+		</p>
+		<p class="wd-custom-photo-upload__hint"><?php esc_html_e( 'JPG, PNG or WEBP. Max 20MB. Required for customization.', 'woodmart' ); ?></p>
+		<div class="wd-custom-photo-upload__controls">
+			<input type="file" id="wd-custom-photo-file" accept="image/jpeg,image/png,image/gif,image/webp,image/avif" />
+			<input type="hidden" name="wd_custom_photo_url" id="wd_custom_photo_url" value="" />
+		</div>
+		<p class="wd-custom-photo-upload__status" id="wd-custom-photo-status" aria-live="polite"></p>
+		<div class="wd-custom-photo-upload__preview" id="wd-custom-photo-preview"></div>
+	</div>
+	<style>
+		.wd-custom-photo-upload { margin: 16px 0 18px; padding: 16px; border: 1px solid #ececec; border-radius: 10px; background: #fafafa; }
+		.wd-custom-photo-upload__label { margin: 0 0 6px; font-size: 15px; }
+		.wd-custom-photo-upload__label .required { color: #de056f; }
+		.wd-custom-photo-upload__hint { margin: 0 0 12px; font-size: 13px; color: #666; }
+		.wd-custom-photo-upload__controls input[type="file"] { max-width: 100%; font-size: 14px; }
+		.wd-custom-photo-upload__status { margin: 10px 0 0; font-size: 13px; min-height: 18px; }
+		.wd-custom-photo-upload__status.is-error { color: #b91c1c; }
+		.wd-custom-photo-upload__status.is-success { color: #15803d; }
+		.wd-custom-photo-upload__preview img { max-width: 120px; height: auto; border-radius: 8px; border: 1px solid #ddd; margin-top: 10px; display: block; }
+	</style>
+	<?php
+}
+add_action( 'woocommerce_before_add_to_cart_button', 'wd_render_custom_photo_upload_field', 12 );
+
+/**
+ * Frontend script for custom photo upload on product pages.
+ */
+function wd_enqueue_custom_photo_upload_script() {
+	if ( ! is_product() ) {
+		return;
+	}
+
+	$product_id = get_queried_object_id();
+	if ( ! wd_requires_custom_photo( $product_id ) ) {
+		return;
+	}
+
+	$inline = "
+	(function() {
+		var wrap = document.getElementById('wd-custom-photo-upload');
+		if (!wrap) return;
+
+		var fileInput = document.getElementById('wd-custom-photo-file');
+		var urlInput = document.getElementById('wd_custom_photo_url');
+		var statusEl = document.getElementById('wd-custom-photo-status');
+		var previewEl = document.getElementById('wd-custom-photo-preview');
+		var ajaxUrl = wrap.getAttribute('data-ajax-url') || '';
+		var uploading = false;
+
+		function setStatus(msg, type) {
+			if (!statusEl) return;
+			statusEl.textContent = msg || '';
+			statusEl.className = 'wd-custom-photo-upload__status' + (type ? ' is-' + type : '');
+		}
+
+		function getCartForm() {
+			return wrap.closest('form.cart') || document.querySelector('form.cart');
+		}
+
+		function blockAddToCart(block) {
+			var form = getCartForm();
+			if (!form) return;
+			form.querySelectorAll('.single_add_to_cart_button, .add_to_cart_button').forEach(function(btn) {
+				btn.disabled = !!block;
+				btn.setAttribute('aria-disabled', block ? 'true' : 'false');
+			});
+		}
+
+		blockAddToCart(true);
+
+		if (!fileInput || !urlInput) return;
+
+		fileInput.addEventListener('change', function() {
+			var file = fileInput.files && fileInput.files[0];
+			if (!file) return;
+
+			if (file.size > 20 * 1024 * 1024) {
+				setStatus('File too large. Max 20MB.', 'error');
+				fileInput.value = '';
+				urlInput.value = '';
+				blockAddToCart(true);
+				return;
+			}
+
+			var formData = new FormData();
+			formData.append('action', 'wd_upload_frame_artwork');
+			formData.append('artwork_file', file);
+
+			uploading = true;
+			blockAddToCart(true);
+			setStatus('Uploading photo…', '');
+
+			fetch(ajaxUrl, { method: 'POST', body: formData, credentials: 'same-origin' })
+				.then(function(res) { return res.json(); })
+				.then(function(data) {
+					uploading = false;
+					if (!data || !data.success || !data.data || !data.data.url) {
+						setStatus((data && data.data && data.data.message) ? data.data.message : 'Upload failed. Please try again.', 'error');
+						urlInput.value = '';
+						blockAddToCart(true);
+						return;
+					}
+					urlInput.value = data.data.url;
+					if (previewEl) {
+						previewEl.innerHTML = '<img src=\"' + data.data.url + '\" alt=\"Uploaded photo\" />';
+					}
+					setStatus('Photo uploaded successfully.', 'success');
+					blockAddToCart(false);
+				})
+				.catch(function() {
+					uploading = false;
+					setStatus('Upload failed. Please try again.', 'error');
+					urlInput.value = '';
+					blockAddToCart(true);
+				});
+		});
+
+		var cartForm = getCartForm();
+		if (cartForm) {
+			cartForm.addEventListener('submit', function(e) {
+				if (uploading) {
+					e.preventDefault();
+					setStatus('Please wait, photo is still uploading.', 'error');
+					return;
+				}
+				if (!urlInput.value) {
+					e.preventDefault();
+					setStatus('Please upload your photo before adding to cart.', 'error');
+				}
+			});
+		}
+
+		document.body.addEventListener('click', function(e) {
+			var btn = e.target && e.target.closest ? e.target.closest('.single_add_to_cart_button, .add_to_cart_button') : null;
+			if (!btn || !getCartForm() || !getCartForm().contains(btn)) return;
+			if (uploading) {
+				e.preventDefault();
+				e.stopPropagation();
+				setStatus('Please wait, photo is still uploading.', 'error');
+				return;
+			}
+			if (!urlInput.value) {
+				e.preventDefault();
+				e.stopPropagation();
+				setStatus('Please upload your photo before adding to cart.', 'error');
+			}
+		}, true);
+	})();
+	";
+
+	wp_register_script( 'wd-custom-photo-upload', false, array(), '1.0.0', true );
+	wp_enqueue_script( 'wd-custom-photo-upload' );
+	wp_add_inline_script( 'wd-custom-photo-upload', $inline );
+}
+add_action( 'wp_enqueue_scripts', 'wd_enqueue_custom_photo_upload_script', 10020 );
+
+/**
+ * Validate custom photo before add to cart.
+ *
+ * @param bool $passed     Validation result.
+ * @param int  $product_id Product ID.
+ * @param int  $quantity   Quantity.
+ * @return bool
+ */
+function wd_validate_custom_photo_upload( $passed, $product_id, $quantity ) {
+	if ( ! $passed || ! wd_requires_custom_photo( $product_id ) ) {
+		return $passed;
+	}
+
+	$url = isset( $_POST['wd_custom_photo_url'] ) ? esc_url_raw( wp_unslash( $_POST['wd_custom_photo_url'] ) ) : '';
+	if ( empty( $url ) ) {
+		wc_add_notice( __( 'Please upload your custom photo before adding to cart.', 'woodmart' ), 'error' );
+		return false;
+	}
+
+	return $passed;
+}
+add_filter( 'woocommerce_add_to_cart_validation', 'wd_validate_custom_photo_upload', 10, 3 );
+
+/**
+ * Store uploaded custom photo in cart.
+ *
+ * @param array $cart_item_data Cart item data.
+ * @param int   $product_id     Product ID.
+ * @return array
+ */
+function wd_capture_custom_photo_cart_item_data( $cart_item_data, $product_id, $variation_id = 0, $variation = array() ) {
+	if ( wd_is_frame_product( $product_id ) || ! wd_requires_custom_photo( $product_id ) ) {
+		return $cart_item_data;
+	}
+
+	$url = isset( $_POST['wd_custom_photo_url'] ) ? esc_url_raw( wp_unslash( $_POST['wd_custom_photo_url'] ) ) : '';
+	if ( empty( $url ) ) {
+		return $cart_item_data;
+	}
+
+	$cart_item_data['wd_custom_photo_required'] = true;
+	$cart_item_data['wd_uploaded_artwork_url']  = $url;
+	$cart_item_data['wd_custom_photo_key']      = md5( $url . microtime() );
+
+	return $cart_item_data;
+}
+add_filter( 'woocommerce_add_cart_item_data', 'wd_capture_custom_photo_cart_item_data', 15, 4 );
+
+/**
+ * Show custom photo in cart/checkout line item data.
+ *
+ * @param array $item_data Item data rows.
+ * @param array $cart_item Cart item.
+ * @return array
+ */
+function wd_render_custom_photo_cart_item_data( $item_data, $cart_item ) {
+	if ( empty( $cart_item['wd_custom_photo_required'] ) || empty( $cart_item['wd_uploaded_artwork_url'] ) ) {
+		return $item_data;
+	}
+
+	$url      = esc_url( $cart_item['wd_uploaded_artwork_url'] );
+	$img_html = '<a href="' . $url . '" target="_blank" rel="noopener noreferrer"><img src="' . $url . '" alt="Custom photo" style="max-width:70px;height:auto;border:1px solid #ddd;border-radius:4px;" /></a>';
+
+	$item_data[] = array(
+		'name'    => __( 'Custom Photo', 'woodmart' ),
+		'value'   => $url,
+		'display' => wp_kses_post( $img_html ),
+	);
+
+	return $item_data;
+}
+add_filter( 'woocommerce_get_item_data', 'wd_render_custom_photo_cart_item_data', 25, 2 );
+
+/**
+ * Save custom photo URL on order line items.
+ *
+ * @param WC_Order_Item_Product $item          Order item.
+ * @param string                $cart_item_key Cart item key.
+ * @param array                 $values        Cart values.
+ * @param WC_Order              $order         Order.
+ */
+function wd_save_custom_photo_order_item_meta( $item, $cart_item_key, $values, $order ) {
+	if ( empty( $values['wd_custom_photo_required'] ) || empty( $values['wd_uploaded_artwork_url'] ) ) {
+		return;
+	}
+
+	$url = esc_url_raw( (string) $values['wd_uploaded_artwork_url'] );
+	$item->add_meta_data( '_wd_uploaded_artwork_url', $url, true );
+	$item->add_meta_data( __( 'Custom Photo', 'woodmart' ), $url, true );
+}
+add_action( 'woocommerce_checkout_create_order_line_item', 'wd_save_custom_photo_order_item_meta', 15, 4 );
 
 /**
  * Build visualizer URL with product context query args.
@@ -2480,6 +3139,28 @@ function craft_with_love_shortcode() {
 			}
 		}
 	}
+	// Fallback: show latest WooCommerce products with store currency (₹) when ACF products are not set.
+	if ( empty( $craft_products ) && class_exists( 'WooCommerce' ) ) {
+		$craft_query = new WP_Query(
+			array(
+				'post_type'      => 'product',
+				'posts_per_page' => 4,
+				'post_status'    => 'publish',
+				'orderby'        => 'date',
+				'order'          => 'DESC',
+			)
+		);
+		if ( $craft_query->have_posts() ) {
+			while ( $craft_query->have_posts() ) {
+				$craft_query->the_post();
+				$product = wc_get_product( get_the_ID() );
+				if ( $product && is_a( $product, 'WC_Product' ) ) {
+					$craft_products[] = $product;
+				}
+			}
+			wp_reset_postdata();
+		}
+	}
 
 	ob_start();
 	?>
@@ -2537,11 +3218,12 @@ function craft_with_love_shortcode() {
 					<?php
 				}
 			} else {
-				$static_items = array(
-					array( 'img' => 'best-sell-1.png', 'title' => 'Baby Clock', 'price' => '<del>$143</del> <span class="wd-price-current">$57</span>' ),
-					array( 'img' => 'best-sell-2.png', 'title' => 'Couple Keychain', 'price' => '<del>$143</del> <span class="wd-price-current">$57</span>' ),
-					array( 'img' => 'best-sell-3.png', 'title' => 'Crafty Album', 'price' => '<del>$143</del> <span class="wd-price-current">$57</span>' ),
-					array( 'img' => 'best-sell-4.png', 'title' => 'Panda Lamp', 'price' => '<del>$143</del> <span class="wd-price-current">$57</span>' ),
+				$demo_price_html = wd_format_sale_price_html( 143, 57 );
+				$static_items    = array(
+					array( 'img' => 'best-sell-1.png', 'title' => 'Baby Clock', 'price' => $demo_price_html ),
+					array( 'img' => 'best-sell-2.png', 'title' => 'Couple Keychain', 'price' => $demo_price_html ),
+					array( 'img' => 'best-sell-3.png', 'title' => 'Crafty Album', 'price' => $demo_price_html ),
+					array( 'img' => 'best-sell-4.png', 'title' => 'Panda Lamp', 'price' => $demo_price_html ),
 				);
 				foreach ( $static_items as $s ) {
 					?>

@@ -17,6 +17,14 @@
 		#check_pincode{width:29% !important; display: inline !important;}
         .vc_custom_1773524135110 .vc_column-inner{ padding-top:0px !important}
 	</style>
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+			var pincodeInput = document.getElementById('shiprocket_pincode_check');
+			if (pincodeInput && pincodeInput.parentElement) {
+				pincodeInput.parentElement.classList.add('d-none');
+			}
+		});
+	</script>
 </head>
 
 <body <?php body_class(); ?>>
