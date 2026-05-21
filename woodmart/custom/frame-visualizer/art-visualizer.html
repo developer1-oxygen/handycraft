@@ -1,0 +1,1923 @@
+<!DOCTYPE html>
+<html lang="en"
+  class="wf-freightsanspro-n4-active wf-freightsanspro-n7-active wf-freightsanspro-n3-active wf-freightsanspro-n6-active wf-freighttextpro-n4-active wf-freighttextpro-i4-active wf-freighttextpro-n7-active wf-freighttextpro-n3-active wf-freighttextpro-i3-active wf-freighttextpro-n5-active wf-freighttextpro-i5-active wf-freighttextpro-n6-active wf-montserrat-n4-active wf-montserrat-n2-active wf-montserrat-i2-active wf-montserrat-i3-active wf-montserrat-n3-active wf-montserrat-i4-active wf-montserrat-n5-active wf-montserrat-n6-active wf-montserrat-n7-active wf-canadatypegibson-n7-active wf-active">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+  <title>Framed Art Visualizer | Level Frames</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://d29mtkonxnc5fw.cloudfront.net/" crossorigin="">
+  <link rel="preconnect" href="https://p.typekit.net/" crossorigin="">
+
+  <link rel="stylesheet" href="./assets/icons.css" crossorigin="">
+  <noscript>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"
+      crossorigin>
+  </noscript>
+
+  <link rel="stylesheet"
+    href="./assets/app.css"
+    media="all">
+  <style>
+    .circular_change_profile_btn,
+    .mobile_frame_editor_arrow {
+      font-family: Arial, sans-serif !important;
+      font-size: 24px;
+      line-height: 1;
+      text-align: center;
+    }
+    .small_profile_thumbs_new_editor .circular_change_profile_btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      vertical-align: middle;
+      padding-top: 1px;
+    }
+    .small_profile_thumbs_new_editor .circular_change_profile_btn.cycle_profile,
+    .mobile_frame_editor_arrow.cycle_profile {
+      display: none !important;
+    }
+    .visualizer_select_box_label_style::before,
+    .visualizer_select_box_label_style::after {
+      content: none !important;
+      display: none !important;
+    }
+    .visualizer_select_box_style {
+      background-image: none !important;
+      min-width: 150px !important;
+      width: 150px !important;
+      white-space: nowrap;
+    }
+    .mounting_controls_link,
+    .mounting_controls_area {
+      display: none !important;
+    }
+    .visualizer-editor-title {
+      font-size: 34px !important;
+      letter-spacing: 0.3px;
+      color: #1f2937;
+      font-weight: 700;
+    }
+    .visualizer-summary {
+      color: #4b5563 !important;
+      font-size: 16px !important;
+      line-height: 1.55 !important;
+      max-width: 92%;
+    }
+    .original_illustrator_upload_btn,
+    .generate_images_btn {
+      border-radius: 10px !important;
+      font-weight: 600 !important;
+      letter-spacing: 0.2px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
+    }
+    .original_illustrator_upload_btn:hover,
+    .generate_images_btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 24px rgba(15, 23, 42, 0.16);
+      opacity: 0.96;
+    }
+    .generate_images_btn {
+      background: #111827 !important;
+      border: 1px solid #111827 !important;
+      color: #ffffff !important;
+    }
+  </style>
+
+  <script
+    src="./assets/app.js"></script>
+  <script>
+    // Compatibility shim: legacy bundled scripts expect global uppyImageUpload variable.
+    window.uppyImageUpload = window.uppyImageUpload || null;
+    var uppyImageUpload = window.uppyImageUpload;
+  </script>
+  <script>
+    (function() {
+      function patchVisualizerThumbPaths() {
+        var fallbackBasePath = "../images/";
+        var hardFallback = fallbackBasePath + "logo.png";
+        var thumbs = document.querySelectorAll('img[src^="./assets/images/"]');
+
+        thumbs.forEach(function(img) {
+          var originalSrc = img.getAttribute("src") || "";
+          var fileName = originalSrc.split("/").pop();
+          if (!fileName) {
+            return;
+          }
+
+          // Keep original src first; only fallback when it actually fails.
+          img.onerror = function() {
+            var current = img.getAttribute("src") || "";
+            var localCandidate = fallbackBasePath + fileName;
+            if (current !== localCandidate && current !== hardFallback) {
+              img.setAttribute("src", localCandidate);
+              return;
+            }
+            if (current !== hardFallback) {
+              img.setAttribute("src", hardFallback);
+            }
+          };
+        });
+      }
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", patchVisualizerThumbPaths, { once: true });
+      } else {
+        patchVisualizerThumbPaths();
+      }
+    })();
+  </script>
+
+
+  <script>
+    // Initial token (fallback). If this fails, nothing else breaks.
+    try {
+      window.uploadIntent = "BAh7BzoIaWF0bCsH8AjpaToIZXhwbCsHABfpaQ==--df68fd8011230f5f8e981d51452d1b74ed3578bbf69fd97fd534e0cbb30e06dd";
+    } catch (e) {
+      window.uploadIntent = "";
+    }
+  </script>
+  <script>
+    (function () {
+      var params = new URLSearchParams(window.location.search || "");
+      var productName = params.get("wc_product") || "";
+      var productPrice = params.get("wc_price") || "";
+      var productImage = params.get("wc_image") || "";
+      var productId = params.get("wc_product_id") || "";
+
+      window.wdFrameProduct = {
+        id: productId,
+        name: productName,
+        price: productPrice,
+        image: productImage
+      };
+
+      if (productName) {
+        document.title = productName + " | Frame Visualizer";
+      }
+    })();
+  </script>
+  <script>
+    (function() {
+      function parseConfigFromQuery() {
+        var params = new URLSearchParams(window.location.search || "");
+        var encoded = params.get("wd_cfg");
+        if (!encoded) {
+          return null;
+        }
+
+        try {
+          var decoded = atob(decodeURIComponent(encoded));
+          return JSON.parse(decoded);
+        } catch (err) {
+          return null;
+        }
+      }
+
+      function buildSceneSwatch(item, isActive) {
+        var key = item && item.key ? item.key : "";
+        var label = item && item.label ? item.label : key;
+        var image = item && item.image ? item.image : "";
+        if (!key || !image) {
+          return "";
+        }
+
+        return '' +
+          '<a href="#" class="scene_control_swatch regular_tooltip ' + (isActive ? 'active_scene_swatch' : '') + '" data-scene-name="' + key.replace(/"/g, '&quot;') + '" title="' + label.replace(/"/g, '&quot;') + '">' +
+            '<span class="scene_swatch_wrapper">' +
+              '<img src="' + image.replace(/"/g, '&quot;') + '" alt="' + label.replace(/"/g, '&quot;') + '">' +
+            '</span>' +
+          '</a>';
+      }
+
+      function buildStyleSwatch(item, isActive) {
+        var key = item && item.key ? item.key : "";
+        var label = item && item.label ? item.label : key;
+        var image = item && item.image ? item.image : "";
+        if (!key || !image) {
+          return "";
+        }
+
+        return '' +
+          '<a href="#" data-frame-color-id="' + key.replace(/"/g, '&quot;') + '" class="profile_swatch_link profile_id_' + key.replace(/"/g, '&quot;') + ' regular_tooltip ' + (isActive ? 'active_profile_swatch' : '') + '" title="' + label.replace(/"/g, '&quot;') + '">' +
+            '<img src="' + image.replace(/"/g, '&quot;') + '" alt="' + label.replace(/"/g, '&quot;') + '">' +
+          '</a>';
+      }
+
+      function applySceneVisualsOnly(items) {
+        if (!Array.isArray(items) || !items.length) return;
+        var wrap = document.querySelector(".scene_controls_area");
+        if (!wrap) return;
+        var existing = Array.prototype.slice.call(wrap.querySelectorAll(".scene_control_swatch"));
+        if (!existing.length) return;
+
+        existing.forEach(function(node, idx) {
+          if (idx >= items.length) {
+            node.style.display = "none";
+            return;
+          }
+          var item = items[idx] || {};
+          node.style.display = "";
+          if (item.label) node.setAttribute("title", item.label);
+          var img = node.querySelector("img");
+          if (img && item.image) {
+            img.setAttribute("src", item.image);
+            img.setAttribute("alt", item.label || ("Scene " + (idx + 1)));
+          }
+        });
+      }
+
+      function applyStyleVisualsOnly(items) {
+        if (!Array.isArray(items) || !items.length) return;
+        var wrap = document.querySelector(".profile_swatches");
+        if (!wrap) return;
+        var existing = Array.prototype.slice.call(wrap.querySelectorAll(".profile_swatch_link"));
+        if (!existing.length) return;
+
+        existing.forEach(function(node, idx) {
+          if (idx >= items.length) {
+            node.style.display = "none";
+            return;
+          }
+          var item = items[idx] || {};
+          node.style.display = "";
+          if (item.label) node.setAttribute("title", item.label);
+          // Do not overwrite data-frame-color-id; app logic depends on original mapping.
+          var img = node.querySelector("img");
+          if (img && item.image) {
+            img.setAttribute("src", item.image);
+            img.setAttribute("alt", item.label || ("Style " + (idx + 1)));
+          }
+        });
+      }
+
+      function buildMatSwatch(item, isActive) {
+        var key = item && item.key ? item.key : "";
+        var label = item && item.label ? item.label : key;
+        var color = item && item.color ? item.color : "";
+        if (!key || !color) {
+          return "";
+        }
+
+        return '' +
+          '<a href="#" class="mat_control_swatch mat_color_id_' + key.replace(/"/g, '&quot;') + ' bottom_tooltip ' + (isActive ? 'active_mat_color_swatch' : '') + '" data-mat-color="' + label.replace(/"/g, '&quot;') + '">' +
+            '<span class="mat_swatch_wrapper">' +
+              '<span class="solid_color_swatch" style="background-color:' + color.replace(/"/g, '&quot;') + ';"></span>' +
+            '</span>' +
+          '</a>';
+      }
+
+      function applyArtworkSizes(sizes) {
+        var sizeSelect = document.getElementById("visualizer-artwork-size");
+        if (!sizeSelect || !Array.isArray(sizes) || !sizes.length) {
+          return;
+        }
+
+        sizeSelect.innerHTML = sizes.map(function(item, i) {
+          var label = item.label || (item.width + '" x ' + item.height + '"');
+          var value = (item.width || "") + "x" + (item.height || "");
+          return '<option value="' + value.replace(/"/g, '&quot;') + '"' + (i === 0 ? ' selected' : '') + '>' + label.replace(/"/g, '&quot;') + '</option>';
+        }).join("");
+        sizeSelect.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+
+      function applyDepthOptions(options) {
+        var depthSelect = document.querySelector(".frame_width_editor_select");
+        if (!depthSelect || !Array.isArray(options) || !options.length) {
+          return;
+        }
+
+        depthSelect.innerHTML = options.map(function(item, i) {
+          var label = item.label || item.value || "";
+          var value = item.value || "";
+          return '<option value="' + String(value).replace(/"/g, '&quot;') + '"' + (i === 0 ? ' selected' : '') + '>' + String(label).replace(/"/g, '&quot;') + '</option>';
+        }).join("");
+        depthSelect.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+
+      function applyMatColors(colors) {
+        if (!Array.isArray(colors) || !colors.length) {
+          return;
+        }
+        var wrap = document.querySelector(".mat_color_swatches_with_tooltips");
+        if (wrap) {
+          wrap.innerHTML = colors.map(function(item, i) {
+            return buildMatSwatch(item, i === 0);
+          }).join("");
+        }
+      }
+
+      function applyRotationVisibility(enabled) {
+        if (typeof enabled !== "boolean") {
+          return;
+        }
+        var rotationBlock = document.querySelector("#rotation_slider");
+        if (!rotationBlock || !rotationBlock.parentElement) {
+          return;
+        }
+        var section = rotationBlock.closest(".m-top-20.p-bottom-40");
+        if (section) {
+          section.style.display = enabled ? "" : "none";
+        }
+      }
+
+      function applySectionVisibility(visibility) {
+        if (!visibility || typeof visibility !== "object") {
+          return;
+        }
+
+        function setDisplay(selector, shouldShow) {
+          var nodes = document.querySelectorAll(selector);
+          nodes.forEach(function(node) {
+            node.style.display = shouldShow ? "" : "none";
+          });
+        }
+
+        if (typeof visibility.upload === "boolean") {
+          setDisplay(".original_illustrator_upload_btn", visibility.upload);
+          setDisplay(".illustrator_post_upload_content", visibility.upload);
+        }
+
+        if (typeof visibility.artwork_size === "boolean") {
+          var sizeLabel = document.querySelector('label[for="visualizer-artwork-size"]');
+          if (sizeLabel) {
+            sizeLabel.style.display = visibility.artwork_size ? "" : "none";
+            var sizeTopGap = sizeLabel.previousElementSibling;
+            if (sizeTopGap) sizeTopGap.style.display = visibility.artwork_size ? "" : "none";
+            var sizeHeader = sizeTopGap ? sizeTopGap.previousElementSibling : null;
+            if (sizeHeader) sizeHeader.style.display = visibility.artwork_size ? "" : "none";
+          }
+        }
+
+        if (typeof visibility.scene === "boolean") {
+          setDisplay(".scenes_controls_section", visibility.scene);
+        }
+
+        if (typeof visibility.style === "boolean") {
+          setDisplay(".frame_style_controls_section", visibility.style);
+        }
+
+        if (typeof visibility.matting === "boolean") {
+          setDisplay(".matting_controls_section", visibility.matting);
+        }
+      }
+
+      function applySliderOptions(selector, cfg) {
+        if (!cfg || typeof cfg !== "object") {
+          return;
+        }
+        var el = document.querySelector(selector);
+        if (!el || !el.noUiSlider) {
+          return;
+        }
+        var min = Number(cfg.min);
+        var max = Number(cfg.max);
+        var step = Number(cfg.step);
+        var start = Number(cfg.start);
+        if (!isFinite(min) || !isFinite(max) || max <= min) {
+          return;
+        }
+        if (!isFinite(step) || step <= 0) {
+          step = 1;
+        }
+        if (!isFinite(start)) {
+          start = min;
+        }
+        if (start < min) start = min;
+        if (start > max) start = max;
+        var decimals = String(step).indexOf(".") >= 0 ? String(step).split(".")[1].length : 0;
+        var factor = Math.pow(10, decimals);
+        function snapToStep(val) {
+          var snapped = Math.round(((val - min) / step)) * step + min;
+          if (snapped < min) snapped = min;
+          if (snapped > max) snapped = max;
+          return Math.round(snapped * factor) / factor;
+        }
+        start = snapToStep(start);
+        try {
+          // Keep mat slider stable by only applying safe updates.
+          if (selector === "#new_mat_slider") {
+            el.noUiSlider.set(start);
+            return;
+          }
+          el.noUiSlider.updateOptions({
+            range: {
+              min: min,
+              max: max
+            },
+            step: step,
+            start: [start]
+          }, true);
+          el.noUiSlider.set(start);
+        } catch (e) {}
+      }
+
+      function applyConfigToDom(config, mode) {
+        if (!config) {
+          return;
+        }
+        var applyMode = mode || "full";
+
+        if (applyMode === "full" && Array.isArray(config.scenes) && config.scenes.length) {
+          applySceneVisualsOnly(config.scenes);
+        }
+
+        if (applyMode === "full" && Array.isArray(config.styles) && config.styles.length) {
+          applyStyleVisualsOnly(config.styles);
+        }
+
+        if (applyMode === "full" && Array.isArray(config.artwork_sizes) && config.artwork_sizes.length) {
+          applyArtworkSizes(config.artwork_sizes);
+        }
+
+        if (applyMode === "full" && Array.isArray(config.depth_options) && config.depth_options.length) {
+          applyDepthOptions(config.depth_options);
+        }
+
+        if (applyMode === "full" && Array.isArray(config.mat_colors) && config.mat_colors.length) {
+          applyMatColors(config.mat_colors);
+        }
+
+        applySectionVisibility(config.visibility);
+        applyRotationVisibility(config.rotation_enabled);
+        applySliderOptions("#new_mat_slider", config.mat_slider);
+        applySliderOptions("#rotation_slider", config.rotation_slider);
+      }
+
+      function initConfig() {
+        var config = parseConfigFromQuery();
+        applyConfigToDom(config, "full");
+        setTimeout(function() { applyConfigToDom(config, "sliders-only"); }, 800);
+        setTimeout(function() { applyConfigToDom(config, "sliders-only"); }, 1800);
+      }
+
+      function bindUploadArtworkFallback() {
+        if (window.__wdUploadFallbackBound) {
+          return;
+        }
+        window.__wdUploadFallbackBound = true;
+        window.__wdUploadedArtworkUrl = window.__wdUploadedArtworkUrl || "";
+
+        var nativeInput = document.createElement("input");
+        nativeInput.type = "file";
+        nativeInput.accept = "image/*";
+        nativeInput.style.display = "none";
+        nativeInput.setAttribute("aria-hidden", "true");
+        document.body.appendChild(nativeInput);
+
+        function applyUploadedImageToFrame(imageUrl) {
+          if (!imageUrl) {
+            return;
+          }
+          var layers = document.querySelectorAll(".artwork_layer");
+          layers.forEach(function(layer) {
+            var expectedBg = 'url("' + imageUrl + '")';
+            if (layer.style.backgroundImage !== expectedBg) {
+              layer.style.backgroundImage = expectedBg;
+            }
+            layer.style.backgroundSize = "cover";
+            layer.style.backgroundPosition = "center center";
+            layer.style.backgroundRepeat = "no-repeat";
+            layer.style.backgroundColor = "#ffffff";
+          });
+          var uploadBlock = document.querySelector(".illustrator_post_upload_content");
+          if (uploadBlock) {
+            uploadBlock.style.display = "block";
+          }
+        }
+
+        function keepUploadedImagePinned() {
+          if (!window.__wdUploadedArtworkUrl) {
+            return;
+          }
+          applyUploadedImageToFrame(window.__wdUploadedArtworkUrl);
+        }
+
+        function setUploadStatus(message, tone) {
+          var el = document.getElementById("wd-upload-status");
+          if (!el) {
+            el = document.getElementById("wd-upload-status-floating");
+            if (!el) {
+              el = document.createElement("div");
+              el.id = "wd-upload-status-floating";
+              el.style.position = "fixed";
+              el.style.right = "16px";
+              el.style.bottom = "16px";
+              el.style.zIndex = "99999";
+              el.style.background = "#ffffff";
+              el.style.border = "1px solid #d1d5db";
+              el.style.borderRadius = "8px";
+              el.style.padding = "8px 10px";
+              el.style.fontSize = "12px";
+              el.style.boxShadow = "0 6px 16px rgba(0,0,0,0.12)";
+              document.body.appendChild(el);
+            }
+          }
+          if (!message) {
+            el.style.display = "none";
+            el.textContent = "";
+            return;
+          }
+          el.style.display = "block";
+          el.textContent = message;
+          el.style.color = tone === "error" ? "#b91c1c" : (tone === "success" ? "#166534" : "#1f2937");
+        }
+
+        function uploadArtworkToServer(file) {
+          if (!file) {
+            return;
+          }
+          window.__wdArtworkUploadInProgress = true;
+          setUploadStatus("Uploading image... please wait.", "info");
+          var formData = new FormData();
+          formData.append("action", "wd_upload_frame_artwork");
+          formData.append("artwork_file", file, file.name || "artwork.jpg");
+
+          fetch(window.location.origin + "/wp-admin/admin-ajax.php", {
+            method: "POST",
+            body: formData,
+            credentials: "same-origin"
+          })
+          .then(function(resp) { return resp.text(); })
+          .then(function(payload) {
+            var parsed = null;
+            try { parsed = JSON.parse(payload); } catch (e) { parsed = null; }
+            if (parsed && parsed.success && parsed.data && parsed.data.url) {
+              window.__wdUploadedArtworkServerUrl = String(parsed.data.url);
+              window.__wdArtworkUploadInProgress = false;
+              setUploadStatus("Image uploaded successfully.", "success");
+              setTimeout(function() { setUploadStatus("", ""); }, 2500);
+              return;
+            }
+            window.__wdArtworkUploadInProgress = false;
+            setUploadStatus("Upload failed. Please try again.", "error");
+          })
+          .catch(function() {
+            // Keep local preview fallback even if server upload fails.
+            window.__wdArtworkUploadInProgress = false;
+            setUploadStatus("Upload failed. Please try again.", "error");
+          });
+        }
+
+        nativeInput.addEventListener("change", function() {
+          var file = nativeInput.files && nativeInput.files[0] ? nativeInput.files[0] : null;
+          if (!file) {
+            return;
+          }
+          window.__wdUploadedArtworkSelected = true;
+          window.__wdUploadedArtworkServerUrl = "";
+          window.__wdUploadedArtworkDataUrl = "";
+          if (window.__wdUploadedArtworkUrl && window.__wdUploadedArtworkUrl.indexOf("blob:") === 0) {
+            try { URL.revokeObjectURL(window.__wdUploadedArtworkUrl); } catch (e) {}
+          }
+          var localUrl = URL.createObjectURL(file);
+          window.__wdUploadedArtworkUrl = localUrl;
+          applyUploadedImageToFrame(localUrl);
+          setUploadStatus("Preparing image...", "info");
+
+          try {
+            var reader = new FileReader();
+            reader.onload = function(evt) {
+              var dataUrl = evt && evt.target ? String(evt.target.result || "") : "";
+              if (dataUrl.indexOf("data:image/") === 0) {
+                window.__wdUploadedArtworkDataUrl = dataUrl;
+              }
+            };
+            reader.readAsDataURL(file);
+          } catch (e) {}
+
+          uploadArtworkToServer(file);
+        });
+
+        document.addEventListener("change", function() {
+          setTimeout(keepUploadedImagePinned, 20);
+        }, true);
+        document.addEventListener("click", function() {
+          setTimeout(keepUploadedImagePinned, 20);
+          setTimeout(keepUploadedImagePinned, 250);
+        }, true);
+
+        var artworkRoot = document.querySelector(".new_frame_editor_wrapper") || document.body;
+        if (window.MutationObserver && artworkRoot) {
+          var observer = new MutationObserver(function() {
+            keepUploadedImagePinned();
+          });
+          observer.observe(artworkRoot, {
+            subtree: true,
+            childList: true,
+            attributes: true,
+            attributeFilter: ["style", "class"]
+          });
+        }
+
+        document.addEventListener("click", function(e) {
+          var trigger = e.target && e.target.closest ? e.target.closest(".upload_illustrator_image, .original_illustrator_upload_btn") : null;
+          if (!trigger) {
+            return;
+          }
+
+          e.preventDefault();
+          if (typeof e.stopPropagation === "function") {
+            e.stopPropagation();
+          }
+          if (typeof e.stopImmediatePropagation === "function") {
+            e.stopImmediatePropagation();
+          }
+
+          nativeInput.value = "";
+          nativeInput.click();
+        }, true);
+      }
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", function() {
+          initConfig();
+          bindUploadArtworkFallback();
+        }, { once: true });
+      } else {
+        initConfig();
+        bindUploadArtworkFallback();
+      }
+    })();
+  </script>
+
+
+
+
+
+
+  <meta name="csrf-param" content="authenticity_token">
+  <meta name="csrf-token"
+    content="hxqbC3ptkuU4TbGkE6vcTqAT0dBTub3k4CBTR6JitQ2iExJyPTwR49f3MzhNI1znU_FHk_GRFTcF5iClOjj2UQ">
+
+  <link rel="stylesheet" href="https://releases.transloadit.com/uppy/v4.18.2/uppy.min.css">
+  <script src="https://releases.transloadit.com/uppy/v4.18.2/uppy.min.js"></script>
+  <script>
+    if (!window.Uppy || !window.Uppy.Uppy) {
+      console.error('Uppy global bundle failed to load.');
+    } else {
+      const Uppy = window.Uppy.Uppy;
+      const Dashboard = window.Uppy.Dashboard;
+      const AwsS3 = window.Uppy.AwsS3;
+      const ImageEditor = window.Uppy.ImageEditor;
+
+      const m = document.querySelector('meta[name="csrf-token"]');
+      const uppyCsrfToken = m ? m.content : undefined;
+
+      const uppy = window.uppy = new Uppy({
+        id: 'uppy-main',
+        allowMultipleUploadBatches: false,
+        restrictions: {
+          maxNumberOfFiles: 1,
+          allowedFileTypes: ['image/*'],
+          maxFileSize: 3 * 1024 * 1024 * 1024, // 3 GB in bytes
+        },
+        autoProceed: true,
+      })
+      .use(Dashboard, {
+        inline: false,
+        target: 'body',
+        trigger: null,                // we'll open it manually
+        disableThumbnailGenerator: true,  // avoids iOS/Chrome canvas crashes on huge images
+        showProgressDetails: true,
+        proudlyDisplayPoweredByUppy: false,
+        closeModalOnClickOutside: true,
+        theme: 'dark',
+        locale: {
+          strings: {
+            dropPasteFiles: 'Drop image here or %{browseFiles}',
+          }
+        }
+      })
+      .use(AwsS3, {
+        endpoint: '', // base; plugin will call /s3/multipart/* for you
+        shouldUseMultipart: true,
+        limit: 2,                     // low concurrency = lower RAM spikes on huge files
+        getChunkSize: (file) => 16 * 1024 * 1024,
+        retryDelays: [0, 1000, 3000, 7000, 15000, 30000],      // sturdier retries
+        cookiesRule: 'same-origin',
+        headers: {
+          'X-CSRF-Token': uppyCsrfToken || '',
+          'X-Upload-Intent': (window.uploadIntent || ''),
+          'X-Correlation-ID': window.uppyImageUpload ? window.uppyImageUpload.correlationId : 'upload_' + Date.now()
+        }
+      });
+
+      uppy.use(ImageEditor, {
+        quality: 1,
+        actions: {
+          revert: true,
+          rotate: true,
+          granularRotate: false,
+          flip: false,
+          zoomIn: false,
+          zoomOut: false,
+          cropSquare: false,
+          cropWidescreen: false,
+          cropWidescreenVertical: false,
+        },
+        cropperOptions: {
+          viewMode: 1,
+        }
+      });
+    }
+  </script>
+
+</head>
+
+<body class="">
+
+
+
+  <div class="level_page_body_wrapper">
+
+    <div id="darken_page" class="darken_page"></div>
+
+    <script>
+      $(document).ready(function () {
+        const pageDarken = $('#darken_page');
+
+        $(document).on('click', '.mobile-toggle-link', function () {
+          toggleMobileDropdown();
+        });
+
+        function toggleMobileDropdown() {
+          $('.main-nav-links').toggleClass('mobile-nav-links');
+
+          try {
+            $('.main-nav-links').menuAim('destroy');
+          } catch (error) {
+            // no-op: menuAim may not be initialized in mobile mode
+          }
+
+          $('.link-without-dropdown').off('mouseenter');
+
+          if ($('.mobile-nav-links').is(':visible')) {
+            pageDarken.addClass('nav_hover_darken_page');
+          } else {
+            pageDarken.removeClass('nav_hover_darken_page');
+          }
+        }
+
+        function activateMenuItem(row) {
+          $('.dropdown-nav-item').removeClass('active-hover');
+          $('.show_icon_on_mobile_only').html('<i class="icon-arrows-down"></i>');
+          $(row).addClass('active-hover');
+          pageDarken.addClass('nav_hover_darken_page');
+        }
+
+        function deactivateMenuItem() {
+          $('.dropdown-nav-item').removeClass('active-hover');
+          $('.show_icon_on_mobile_only').html('<i class="icon-arrows-down"></i>');
+          if (!$('.mobile-nav-links').is(':visible')) {
+            pageDarken.removeClass('nav_hover_darken_page');
+          }
+        }
+
+        function collapseMobileDropdown() {
+          $('.main-nav-links').removeClass('mobile-nav-links');
+          pageDarken.removeClass('nav_hover_darken_page');
+        }
+
+        if (levelApp.utils.isTouchDevice() || $('.mobile_right_links').is(':visible')) {
+          // don't activate menuAim for mobile devices or pages we want it click triggered.
+        } else {
+          $('.main-nav-links').menuAim({
+            activate: activateMenuItem,
+            deactivate: deactivateMenuItem,
+
+            exitMenu: function (row) {
+              return true;
+            },
+            // rowSelector: 'li.dropdown-nav-item',
+            submenuSelector: "li.dropdown-nav-item",
+            submenuDirection: "below",
+          });
+
+          $('.link-without-dropdown').on('mouseenter', function () {
+            deactivateMenuItem();
+          });
+        }
+
+        $(document).on('click', '.dropdown-nav-item a.nav-link', function (e) {
+          e.preventDefault();
+
+          let row = $(this).parent();
+
+          if ($(this).parent('.active-hover').length) {
+            deactivateMenuItem(); // clicking the same one that is active, so collapse it instead.
+          } else {
+            activateMenuItem(row);
+            $(this).find('span').html('<i class="icon-arrows-up"></i>');
+          }
+
+          if ($('.mobile_right_links').is(':visible')) {
+            $('html, body').animate({
+              scrollTop: $(row).offset().top
+            }, 500);
+          }
+        });
+
+        $(document).on('click', '.nav_hover_darken_page', function () {
+          deactivateMenuItem();
+          collapseMobileDropdown();
+        });
+
+        $(document).on('click', '.close-nav-dropdown', function () {
+          deactivateMenuItem();
+        });
+
+        $(document).on('click', '.more-custom-frames-links-button', function (e) {
+          e.preventDefault();
+          $('.more-custom-frames-links').toggle(200, function () {
+            if ($(this).is(':visible')) {
+              $('.more-custom-frames-links-plus').html('-');
+            } else {
+              $('.more-custom-frames-links-plus').html('+');
+            }
+          });
+        });
+
+        $(document).on('click', '.more-partnerships-links-button', function (e) {
+          e.preventDefault();
+          $('.more-partnership-links').toggle(200, function () {
+            if ($(this).is(':visible')) {
+              $('.more-partnerships-links-plus').html('-');
+            } else {
+              $('.more-partnerships-links-plus').html('+');
+            }
+          });
+        });
+      });
+    </script>
+
+    <script>
+      var optionsData = { "glazes": { "options": [{ "glaze": "Standard", "glazeId": 1, "glazePricePerSquareInch": 0.065 }, { "glaze": "UV Protection", "glazeId": 2, "glazePricePerSquareInch": 0.105 }, { "glaze": "Non-Glare", "glazeId": 6, "glazePricePerSquareInch": 0.09 }, { "glaze": "None", "glazeId": 3, "glazePricePerSquareInch": 0.02 }, { "glaze": "Non-Glare UV", "glazeId": 4, "glazePricePerSquareInch": 0.115 }, { "glaze": "Optium Museum", "glazeId": 5, "glazePricePerSquareInch": 0.55 }], "totalItems": 6, "cyclePosition": 0, "optionsIdIndex": { "1": 0, "2": 1, "3": 3, "4": 4, "5": 5, "6": 2 }, "optionsDataIndex": { "None": 3, "Standard": 0, "Non-Glare": 2, "Non-Glare UV": 4, "Optium Museum": 5, "UV Protection": 1 } }, "matColors": { "options": [{ "matColor": "White", "matColorId": 1, "matColorValue": "rgb(255, 255, 255)", "matColorAddonPrice": 0.0, "matInnerLitBevelColor": "rgb(241, 241, 241)", "matInnerShadedBevelColor": "rgb(240, 240, 240)", "matColorPricePerSquareInch": 0.03 }, { "matColor": "Black", "matColorId": 2, "matColorValue": "hsl(0, 0%, 13%)", "matColorAddonPrice": 0.0, "matInnerLitBevelColor": "hsl(0, 0%, 16%)", "matInnerShadedBevelColor": "hsl(0, 0%, 15%)", "matColorPricePerSquareInch": 0.03 }, { "matColor": "Antique White", "matColorId": 18, "matColorValue": "hsl(47, 100%, 96%)", "matColorAddonPrice": 0.0, "matInnerLitBevelColor": "hsl(47, 100%, 99%)", "matInnerShadedBevelColor": "hsl(47, 100%, 98%)", "matColorPricePerSquareInch": 0.03 }, { "matColor": "Cream", "matColorId": 7, "matColorValue": "hsl(51, 78%, 91%)", "matColorAddonPrice": 0.0, "matInnerLitBevelColor": "hsl(51, 78%, 95%)", "matInnerShadedBevelColor": "hsl(51, 78%, 93%)", "matColorPricePerSquareInch": 0.03 }, { "matColor": "Cool Gray", "matColorId": 8, "matColorValue": "hsl(200, 4%, 74%)", "matColorAddonPrice": 0.0, "matInnerLitBevelColor": "hsl(200, 4%, 77%)", "matInnerShadedBevelColor": "hsl(200, 4%, 76%)", "matColorPricePerSquareInch": 0.03 }, { "matColor": "Charcoal", "matColorId": 9, "matColorValue": "hsl(0, 0%, 36%)", "matColorAddonPrice": 0.0, "matInnerLitBevelColor": "hsl(0, 0%, 40%)", "matInnerShadedBevelColor": "hsl(0, 0%, 40%)", "matColorPricePerSquareInch": 0.03 }, { "matColor": "Bright White", "matColorId": 3, "matColorValue": "hsla(0, 0%, 100%, 1)", "matColorAddonPrice": 0.0, "matInnerLitBevelColor": "#dedede", "matInnerShadedBevelColor": "#d3c8c2", "matColorPricePerSquareInch": 0.03 }, { "matColor": "Pure White Black Core", "matColorId": 4, "matColorValue": "hsla(0, 0%, 100%, 1)", "matColorAddonPrice": 0.0, "matInnerLitBevelColor": "#333", "matInnerShadedBevelColor": "#333", "matColorPricePerSquareInch": 0.03 }, { "matColor": "White Elephant", "matColorId": 5, "matColorValue": "hsla(46, 8%, 94%)", "matColorAddonPrice": 0.0, "matInnerLitBevelColor": "#dedede", "matInnerShadedBevelColor": "#d3c8c2", "matColorPricePerSquareInch": 0.03 }, { "matColor": "Bright White", "matColorId": 6, "matColorValue": "", "matColorAddonPrice": 0.0, "matInnerLitBevelColor": "", "matInnerShadedBevelColor": "", "matColorPricePerSquareInch": 0.03 }, { "matColor": "Red", "matColorId": 10, "matColorValue": "#BF2D35", "matColorAddonPrice": 0.0, "matInnerLitBevelColor": "#f0f2f2", "matInnerShadedBevelColor": "#eaebeb", "matColorPricePerSquareInch": 0.03 }, { "matColor": "Wine", "matColorId": 11, "matColorValue": "#6e1421", "matColorAddonPrice": 0.0, "matInnerLitBevelColor": "#f0f2f2", "matInnerShadedBevelColor": "#eaebeb", "matColorPricePerSquareInch": 0.03 }, { "matColor": "Goldenrod", "matColorId": 12, "matColorValue": "#f7c03e", "matColorAddonPrice": 0.0, "matInnerLitBevelColor": "#dedede", "matInnerShadedBevelColor": "#d3c8c2", "matColorPricePerSquareInch": 0.03 }, { "matColor": "Bronze", "matColorId": 13, "matColorValue": "#d9a443", "matColorAddonPrice": 0.0, "matInnerLitBevelColor": "#f0f2f2", "matInnerShadedBevelColor": "#eaebeb", "matColorPricePerSquareInch": 0.03 }, { "matColor": "Blue", "matColorId": 14, "matColorValue": "#254E80", "matColorAddonPrice": 0.0, "matInnerLitBevelColor": "#f0f2f2", "matInnerShadedBevelColor": "#eaebeb", "matColorPricePerSquareInch": 0.03 }, { "matColor": "Navy", "matColorId": 15, "matColorValue": "#1f2a4a", "matColorAddonPrice": 0.0, "matInnerLitBevelColor": "#f0f2f2", "matInnerShadedBevelColor": "#eaebeb", "matColorPricePerSquareInch": 0.03 }, { "matColor": "Forest Green", "matColorId": 16, "matColorValue": "#2e451d", "matColorAddonPrice": 0.0, "matInnerLitBevelColor": "#f0f2f2", "matInnerShadedBevelColor": "#eaebeb", "matColorPricePerSquareInch": 0.03 }, { "matColor": "Deep Purple", "matColorId": 17, "matColorValue": "#2d1259", "matColorAddonPrice": 0.0, "matInnerLitBevelColor": "#f0f2f2", "matInnerShadedBevelColor": "#eaebeb", "matColorPricePerSquareInch": 0.03 }, { "matColor": "8-Ply White", "matColorId": 20, "matColorValue": "rgb(255, 255, 255)", "matColorAddonPrice": 10.0, "matInnerLitBevelColor": "rgb(241, 241, 241)", "matInnerShadedBevelColor": "rgb(240, 240, 240)", "matColorPricePerSquareInch": 0.06 }, { "matColor": "None", "matColorId": 19, "matColorValue": "hsla(0, 0%, 100%, 1)", "matColorAddonPrice": 0.0, "matInnerLitBevelColor": "#f0f2f2", "matInnerShadedBevelColor": "#eaebeb", "matColorPricePerSquareInch": 0.03 }, { "matColor": "8-Ply Black", "matColorId": 21, "matColorValue": "hsl(0, 0%, 13%)", "matColorAddonPrice": 10.0, "matInnerLitBevelColor": "hsl(0, 0%, 16%)", "matInnerShadedBevelColor": "hsl(0, 0%, 15%)", "matColorPricePerSquareInch": 0.06 }, { "matColor": "8-Ply Antique White", "matColorId": 22, "matColorValue": "hsl(47, 100%, 96%)", "matColorAddonPrice": 10.0, "matInnerLitBevelColor": "hsl(47, 100%, 99%)", "matInnerShadedBevelColor": "hsl(47, 100%, 98%)", "matColorPricePerSquareInch": 0.06 }, { "matColor": "Purple Haze", "matColorId": 23, "matColorValue": "#6e7089", "matColorAddonPrice": 0.0, "matInnerLitBevelColor": "#f0f2f2", "matInnerShadedBevelColor": "#eaebeb", "matColorPricePerSquareInch": 0.03 }, { "matColor": "8-Ply Cream", "matColorId": 24, "matColorValue": "hsl(51, 78%, 91%)", "matColorAddonPrice": 10.0, "matInnerLitBevelColor": "hsl(47, 100%, 99%)", "matInnerShadedBevelColor": "hsl(47, 100%, 98%)", "matColorPricePerSquareInch": 0.06 }], "totalItems": 24, "cyclePosition": 0, "optionsIdIndex": { "1": 0, "2": 1, "3": 6, "4": 7, "5": 8, "6": 9, "7": 3, "8": 4, "9": 5, "10": 10, "11": 11, "12": 12, "13": 13, "14": 14, "15": 15, "16": 16, "17": 17, "18": 2, "19": 19, "20": 18, "21": 20, "22": 21, "23": 22, "24": 23 }, "optionsDataIndex": { "Red": 10, "Blue": 14, "Navy": 15, "None": 19, "Wine": 11, "Black": 1, "Cream": 3, "White": 0, "Bronze": 13, "Charcoal": 5, "Cool Gray": 4, "Goldenrod": 12, "8-Ply Black": 20, "8-Ply Cream": 23, "8-Ply White": 18, "Deep Purple": 17, "Purple Haze": 22, "Bright White": 9, "Forest Green": 16, "Antique White": 2, "White Elephant": 8, "8-Ply Antique White": 21, "Pure White Black Core": 7 } }, "matWidths": { "options": [{ "mat": 0, "matId": 4 }, { "mat": 0.5, "matId": 49 }, { "mat": 0.75, "matId": 55 }, { "mat": 1, "matId": 1 }, { "mat": 1.25, "matId": 46 }, { "mat": 1.5, "matId": 7 }, { "mat": 1.75, "matId": 54 }, { "mat": 2, "matId": 2 }, { "mat": 2.5, "matId": 8 }, { "mat": 3, "matId": 3 }, { "mat": 3.5, "matId": 9 }, { "mat": 3.75, "matId": 50 }, { "mat": 4, "matId": 12 }, { "mat": 4.5, "matId": 91 }, { "mat": 5, "matId": 48 }, { "mat": 5.5, "matId": 92 }, { "mat": 6, "matId": 90 }, { "mat": 8, "matId": 57 }, { "mat": 16, "matId": 56 }], "totalItems": 12, "cyclePosition": 0, "optionsIdIndex": { "1": 3, "2": 7, "3": 9, "4": 0, "7": 5, "8": 8, "9": 10, "12": 12, "46": 4, "48": 14, "49": 1, "50": 11, "54": 6, "55": 2, "56": 18, "57": 17, "90": 16, "91": 13, "92": 15 }, "optionsDataIndex": { "0": 0, "1": 3, "2": 7, "3": 9, "4": 12, "5": 14, "6": 16, "8": 17, "16": 18, "0.5": 1, "1.5": 5, "2.5": 8, "3.5": 10, "4.5": 13, "5.5": 15, "0.75": 2, "1.25": 4, "1.75": 6, "3.75": 11 }, "regularEditorOptions": [{ "mat": 0, "matId": 4 }, { "mat": 1, "matId": 1 }, { "mat": 1.5, "matId": 7 }, { "mat": 2, "matId": 2 }, { "mat": 2.5, "matId": 8 }, { "mat": 3, "matId": 3 }, { "mat": 3.5, "matId": 9 }, { "mat": 4, "matId": 12 }, { "mat": 5, "matId": 48 }, { "mat": 6, "matId": 90 }, { "mat": 4.5, "matId": 91 }, { "mat": 5.5, "matId": 92 }] }, "paperTypes": { "options": [{ "paperType": "Photo Paper Lustre Finish", "paperTypeId": 1, "paperPricePerSquareInch": 0.07 }, { "paperType": "Archival Matte Art Paper", "paperTypeId": 2, "paperPricePerSquareInch": 0.07 }, { "paperType": "Pura Smooth", "paperTypeId": 3, "paperPricePerSquareInch": 0.08 }, { "paperType": "Elegance Velvet", "paperTypeId": 4, "paperPricePerSquareInch": 0.08 }, { "paperType": "Hot Press Bright", "paperTypeId": 5, "paperPricePerSquareInch": 0.08 }, { "paperType": "Textured Watercolor", "paperTypeId": 6, "paperPricePerSquareInch": 0.1 }, { "paperType": "Sunset Select Matte Canvas", "paperTypeId": 7, "paperPricePerSquareInch": 0.1 }, { "paperType": "Arches 310g Watercolor Paper", "paperTypeId": 8, "paperPricePerSquareInch": 0.09 }, { "paperType": "Canvas", "paperTypeId": 9, "paperPricePerSquareInch": 0.09 }], "totalItems": 9, "cyclePosition": 0, "optionsIdIndex": { "1": 0, "2": 1, "3": 2, "4": 3, "5": 4, "6": 5, "7": 6, "8": 7, "9": 8 }, "optionsDataIndex": { "Canvas": 8, "Pura Smooth": 2, "Elegance Velvet": 3, "Hot Press Bright": 4, "Textured Watercolor": 5, "Archival Matte Art Paper": 1, "Photo Paper Lustre Finish": 0, "Sunset Select Matte Canvas": 6, "Arches 310g Watercolor Paper": 7 } }, "substrates": { "options": [{ "substrate": "Chalkboard", "substrateId": 1, "substrateDescription": "Design and frame this premium, magnetic chalkboard to fit any space in your home or office.", "substrateRenderColor": "#333333", "substrateRenderImage": "", "substrateIncludedItems": "Chalk, Eraser", "substratePricePerSquareInch": 0.12 }, { "substrate": "Whiteboard", "substrateId": 2, "substrateDescription": "Design and frame this premium, magnetic dry-erase whiteboard to fit any space in your home or office.", "substrateRenderColor": "#ffffff", "substrateRenderImage": "", "substrateIncludedItems": "Marker, Eraser", "substratePricePerSquareInch": 0.06 }, { "substrate": "Corkboard", "substrateId": 3, "substrateDescription": "Design and frame this premium corkboard to fit any space in your home or office", "substrateRenderColor": "", "substrateRenderImage": "https://d29mtkonxnc5fw.cloudfront.net/thumbs/GzEui59t0CnLU-wfL6v1jQ.jpg", "substrateIncludedItems": "Push Pins", "substratePricePerSquareInch": 0.02 }], "totalItems": 3, "cyclePosition": 0, "optionsIdIndex": { "1": 0, "2": 1, "3": 2 }, "optionsDataIndex": { "Corkboard": 2, "Chalkboard": 0, "Whiteboard": 1 } }, "frameWidths": { "options": [{ "frameWidth": 0.75, "frameWidthId": 5, "framePricePerLinearInch": 0.42 }, { "frameWidth": 1, "frameWidthId": 6, "framePricePerLinearInch": 0.49 }, { "frameWidth": 1.25, "frameWidthId": 2, "framePricePerLinearInch": 0.49 }, { "frameWidth": 1.5, "frameWidthId": 7, "framePricePerLinearInch": 0.49 }, { "frameWidth": 1.625, "frameWidthId": 8, "framePricePerLinearInch": 0.45 }, { "frameWidth": 1.75, "frameWidthId": 9, "framePricePerLinearInch": 0.43 }, { "frameWidth": 0.25, "frameWidthId": 42, "framePricePerLinearInch": 0.0 }, { "frameWidth": 1.125, "frameWidthId": 43, "framePricePerLinearInch": 0.0 }, { "frameWidth": 0, "frameWidthId": 44, "framePricePerLinearInch": 0.0 }, { "frameWidth": 0.8, "frameWidthId": 45, "framePricePerLinearInch": 0.0 }, { "frameWidth": 2.25, "frameWidthId": 46, "framePricePerLinearInch": 0.0 }, { "frameWidth": 0.5, "frameWidthId": 47, "framePricePerLinearInch": 0.0 }, { "frameWidth": 2.125, "frameWidthId": 48, "framePricePerLinearInch": 0.0 }], "totalItems": 13, "cyclePosition": 0, "optionsIdIndex": { "2": 2, "5": 0, "6": 1, "7": 3, "8": 4, "9": 5, "42": 6, "43": 7, "44": 8, "45": 9, "46": 10, "47": 11, "48": 12 }, "optionsDataIndex": { "0": 8, "1": 1, "0.5": 11, "0.8": 9, "1.5": 3, "0.25": 6, "0.75": 0, "1.25": 2, "1.75": 5, "2.25": 10, "1.125": 7, "1.625": 4, "2.125": 12 } }, "frameProfiles": { "options": [{ "faceImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/black-frame-face17.jpg", "sideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/black-vector-side9.jpg", "frameColor": "Black Maple", "swatchName": "black-maple2", "frameColorId": 6, "frameColorPrice": 39.0, "frameWidthDepths": { "1": "1.0", "1.5": "1.125", "0.75": "1.125" }, "frameWidthPrices": { "1": "0.5", "1.5": "0.55", "0.75": "0.43" }, "backupRenderColor": "#000000", "frameCollectionId": "1", "profileDescription": "Hard to go wrong with this versatile and timeless profile. This smooth, satin finished frame pairs well with almost any artwork or photograph.", "horizontalSideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/black-frame-horizontal-side.jpg", "maxBorderImageSlice": 85, "frameWidthsAvailable": [0.75, 1, 1.5], "frameWidthRabbetDepths": { "1": "0.125", "1.5": "0.125", "0.75": "0.125" }, "frameWidthTrueRabbetDepths": { "1": 0.875, "1.5": 1.0, "0.75": 1.0 } }, { "faceImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/white-frame-vector2.jpg", "sideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/white-vector-side.jpg", "frameColor": "White Maple", "swatchName": "white-maple4", "frameColorId": 2, "frameColorPrice": 39.0, "frameWidthDepths": { "1": "1.0", "1.5": "1.125", "0.75": "1.125" }, "frameWidthPrices": { "1": "0.5", "1.5": "0.55", "0.75": "0.43" }, "backupRenderColor": "#000000", "frameCollectionId": "1", "profileDescription": "Another classic found in many homes. With its smooth, satin finish, this profile is perfect for a contemporary look or to enhance vibrant colors.", "horizontalSideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/white-frame-side3.jpg", "maxBorderImageSlice": 135, "frameWidthsAvailable": [0.75, 1, 1.5], "frameWidthRabbetDepths": { "1": "0.125", "1.5": "0.125", "0.75": "0.125" }, "frameWidthTrueRabbetDepths": { "1": 0.875, "1.5": 1.0, "0.75": 1.0 } }, { "faceImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/natural-frame-face.jpg", "sideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/natural-maple-side2.jpg", "frameColor": "Natural Maple", "swatchName": "natural-maple2", "frameColorId": 3, "frameColorPrice": 39.0, "frameWidthDepths": { "1": "0.75", "1.5": "1.5", "0.75": "1.0" }, "frameWidthPrices": { "1": "1.0", "1.5": "1.25", "0.75": "0.8" }, "backupRenderColor": "#000000", "frameCollectionId": "1", "profileDescription": "This blonde shade of maple with natural grain is a perfect choice for adding a pop of color that is still soft on the eyes.", "horizontalSideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/natural-maple-horizontal.jpg", "maxBorderImageSlice": 38, "frameWidthsAvailable": [0.75, 1, 1.5], "frameWidthRabbetDepths": { "1": "0.125", "1.5": "0.125", "0.75": "0.125" }, "frameWidthTrueRabbetDepths": { "1": 0.625, "1.5": 0.625, "0.75": 0.75 } }, { "faceImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/natural-walnut-render-face2.jpg", "sideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/natural-walnut-side-render2.jpg", "frameColor": "Natural Walnut", "swatchName": "natural-walnut-new", "frameColorId": 5, "frameColorPrice": 39.0, "frameWidthDepths": { "1": "0.75", "1.5": "0.75", "0.75": "1.0" }, "frameWidthPrices": { "1": "1.0", "1.5": "1.25", "0.75": "0.8" }, "backupRenderColor": "#000000", "frameCollectionId": "1", "profileDescription": "A rich medium-dark wood tone that is versatile enough for a range of decor styles, from modern to bohemian.", "horizontalSideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/natural-walnut-side-render2.jpg", "maxBorderImageSlice": 90, "frameWidthsAvailable": [0.75, 1, 1.5], "frameWidthRabbetDepths": { "1": "0.125", "1.5": "0.125", "0.75": "0.125" }, "frameWidthTrueRabbetDepths": { "1": 0.5, "1.5": 0.625, "0.75": 0.75 } }, { "faceImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/lancaster-dark-face.jpg", "sideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/lancaster-dark-side2.jpg", "frameColor": "Weathered Black", "swatchName": "weathered-black2", "frameColorId": 7, "frameColorPrice": 39.0, "frameWidthDepths": { "0.75": "1.125", "1.625": "0.75" }, "frameWidthPrices": { "0.75": "0.55", "1.625": "0.65" }, "backupRenderColor": "#000000", "frameCollectionId": "2", "profileDescription": "Dark, midnight hues wash over but do not fully hide the wood grain in this rougher take on a modern black frame.", "horizontalSideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/lancaster-dark-horizontal.jpg", "maxBorderImageSlice": 90, "frameWidthsAvailable": [0.75, 1.625], "frameWidthRabbetDepths": { "0.75": "0.125", "1.625": "0.25" }, "frameWidthTrueRabbetDepths": { "0.75": 1.0, "1.625": 0.5 } }, { "faceImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/weathered-grey-face.jpg", "sideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/weathered-grey-improved2.jpg", "frameColor": "Weathered Grey", "swatchName": "weathered-grey", "frameColorId": 8, "frameColorPrice": 39.0, "frameWidthDepths": { "0.75": "1.125", "1.625": "0.75" }, "frameWidthPrices": { "0.75": "0.55", "1.625": "0.65" }, "backupRenderColor": "#000000", "frameCollectionId": "2", "profileDescription": "The texture and finish evoke an old barn aesthetic, while the slimmer shape of this profile adds a modern twist.", "horizontalSideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/weathered-grey-side-horizontal1.jpg", "maxBorderImageSlice": 90, "frameWidthsAvailable": [0.75, 1.625], "frameWidthRabbetDepths": { "0.75": "0.125", "1.625": "0.25" }, "frameWidthTrueRabbetDepths": { "0.75": 1.0, "1.625": 0.5 } }, { "faceImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/weathered-natural-face-2.jpg", "sideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/weathered-natural-side-large4.jpg", "frameColor": "Weathered Natural", "swatchName": "weathered-natural3", "frameColorId": 9, "frameColorPrice": 39.0, "frameWidthDepths": { "0.75": "1.125", "1.625": "0.75" }, "frameWidthPrices": { "0.75": "0.55", "1.625": "0.65" }, "backupRenderColor": "#000000", "frameCollectionId": "2", "profileDescription": "The sandy color and wide lines of the grain in this profile bring to mind a beach house or remote cabin feel.", "horizontalSideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/driftwood-side-horizontal.jpg", "maxBorderImageSlice": 82, "frameWidthsAvailable": [0.75, 1.625], "frameWidthRabbetDepths": { "0.75": "0.125", "1.625": "0.25" }, "frameWidthTrueRabbetDepths": { "0.75": 1.0, "1.625": 0.5 } }, { "faceImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/academie-face.jpg", "sideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/matte-black-side3.jpg", "frameColor": "Academie Black", "swatchName": "academie-black", "frameColorId": 10, "frameColorPrice": 39.0, "frameWidthDepths": { "0.75": "1.0", "1.25": "1.0" }, "frameWidthPrices": { "0.75": "0.6", "1.25": "0.7" }, "backupRenderColor": "#000000", "frameCollectionId": "3", "profileDescription": "The gold trim creates a lavish contrast to the darker base, creating a dressed up version of our Gallery Black profile.", "horizontalSideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/black-frame-horizontal-side.jpg", "maxBorderImageSlice": 108, "frameWidthsAvailable": [0.75, 1.25], "frameWidthRabbetDepths": { "0.75": "0.125", "1.25": "0.25" }, "frameWidthTrueRabbetDepths": { "0.75": 0.75, "1.25": 0.5 } }, { "faceImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/academie-gold.jpg", "sideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/academie-gold-side-xlarge.jpg", "frameColor": "Academie Gold", "swatchName": "academie-gold", "frameColorId": 12, "frameColorPrice": 39.0, "frameWidthDepths": { "0.75": "1.0", "1.25": "1.0" }, "frameWidthPrices": { "0.75": "0.6", "1.25": "0.7" }, "backupRenderColor": "#000000", "frameCollectionId": "3", "profileDescription": "A vintage profile that will stand out in any space with its elegant contours, gold finish and subtle flecks.", "horizontalSideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/academie-gold-horizontal.jpg", "maxBorderImageSlice": 120, "frameWidthsAvailable": [0.75, 1.25], "frameWidthRabbetDepths": { "0.75": "0.125", "1.25": "0.25" }, "frameWidthTrueRabbetDepths": { "0.75": 0.75, "1.25": 0.5 } }, { "faceImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/academie-yellow.jpg", "sideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/academie-silver-side-large3.jpg", "frameColor": "Academie Silver", "swatchName": "academie-silver", "frameColorId": 11, "frameColorPrice": 39.0, "frameWidthDepths": { "0.75": "1.0", "1.25": "1.0" }, "frameWidthPrices": { "0.75": "0.6", "1.25": "0.7" }, "backupRenderColor": "#000000", "frameCollectionId": "3", "profileDescription": "A silver, champagne profile perfect for classing up extra special artwork and moments caught on camera.", "horizontalSideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/academie-yellow-horizontal.jpg", "maxBorderImageSlice": 105, "frameWidthsAvailable": [0.75, 1.25], "frameWidthRabbetDepths": { "0.75": "0.125", "1.25": "0.25" }, "frameWidthTrueRabbetDepths": { "0.75": 0.75, "1.25": 0.5 } }, { "faceImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/kota-pecan-face3.jpg", "sideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/kota-pecan-side2.jpg", "frameColor": "Kota Pecan", "swatchName": "kota-pecan5", "frameColorId": 68, "frameColorPrice": 0.0, "frameWidthDepths": { "1": "1.75", "0.75": "1.25" }, "frameWidthPrices": { "1": "1.0", "0.75": "0.65" }, "backupRenderColor": "#000000", "frameCollectionId": "7", "profileDescription": "The golden pecan stain over a fine wood grain makes this frame timeless and versatile.", "horizontalSideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/kota-pecan-side2.jpg", "maxBorderImageSlice": 75, "frameWidthsAvailable": [0.75, 1], "frameWidthRabbetDepths": { "1": "0.125", "0.75": "0.125" }, "frameWidthTrueRabbetDepths": { "1": 1.375, "0.75": 1.0 } }, { "faceImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/kota-cherry-face4.jpg", "sideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/kota-cherry-side.jpg", "frameColor": "Kota Cherry", "swatchName": "kota-cherry", "frameColorId": 67, "frameColorPrice": 0.0, "frameWidthDepths": { "1": "1.75", "0.75": "1.25" }, "frameWidthPrices": { "1": "1.0", "0.75": "0.65" }, "backupRenderColor": "#000000", "frameCollectionId": "7", "profileDescription": "The deep cherry stain over a fine wood grain makes this frame timeless and versatile.", "horizontalSideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/kota-cherry-side.jpg", "maxBorderImageSlice": 75, "frameWidthsAvailable": [0.75, 1], "frameWidthRabbetDepths": { "1": "0.125", "0.75": "0.125" }, "frameWidthTrueRabbetDepths": { "1": 1.375, "0.75": 1.0 } }, { "faceImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/kota-walnut-render-face3.jpg", "sideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/kota-walnut-side-render.jpg", "frameColor": "Kota Walnut", "swatchName": "kota-walnut-new2", "frameColorId": 61, "frameColorPrice": 0.0, "frameWidthDepths": { "1": "1.75", "0.75": "1.25" }, "frameWidthPrices": { "1": "1.0", "0.75": "0.65" }, "backupRenderColor": "#000000", "frameCollectionId": "7", "profileDescription": "The rich walnut stain over a fine wood grain makes this frame timeless and versatile.", "horizontalSideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/kota-walnut-side-render.jpg", "maxBorderImageSlice": 80, "frameWidthsAvailable": [0.75, 1], "frameWidthRabbetDepths": { "1": "0.125", "0.75": "0.125" }, "frameWidthTrueRabbetDepths": { "1": 1.375, "0.75": 1.0 } }, { "faceImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/kota-face4.jpg", "sideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/kota-side14.jpg", "frameColor": "Kota Black", "swatchName": "kota-black", "frameColorId": 60, "frameColorPrice": 0.0, "frameWidthDepths": { "1": "1.75", "0.75": "1.25" }, "frameWidthPrices": { "1": "1.0", "0.75": "0.65" }, "backupRenderColor": "#000000", "frameCollectionId": "7", "profileDescription": "A deep black stain over a fine wood grain adds subtle texture to this minimalist frame. ", "horizontalSideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/kota-side14.jpg", "maxBorderImageSlice": 105, "frameWidthsAvailable": [0.75, 1], "frameWidthRabbetDepths": { "1": "0.125", "0.75": "0.125" }, "frameWidthTrueRabbetDepths": { "1": 1.375, "0.75": 1.0 } }, { "faceImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/sahara-gold-face.jpg", "sideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/sahara-side4.jpg", "frameColor": "Sahara Gold", "swatchName": "sahara-gold", "frameColorId": 66, "frameColorPrice": 0.0, "frameWidthDepths": { "1": "1.875", "0.75": "1.125" }, "frameWidthPrices": { "1": "1.2", "0.75": "0.9" }, "backupRenderColor": "#000000", "frameCollectionId": "6", "profileDescription": "A sleek and modern wood frame with a polished gold finish. This transitional profile complements a wide array of art and decor styles.", "horizontalSideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/sahara-side4.jpg", "maxBorderImageSlice": 110, "frameWidthsAvailable": [0.75, 1], "frameWidthRabbetDepths": { "1": "0.125", "0.75": "0.125" }, "frameWidthTrueRabbetDepths": { "1": 1.5, "0.75": 0.875 } }, { "faceImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/arctic-silver-face4.jpg", "sideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/arctic-silver-side3.jpg", "frameColor": "Arctic Silver", "swatchName": "arctic-silver", "frameColorId": 65, "frameColorPrice": 0.0, "frameWidthDepths": { "1": "1.875", "0.75": "1.125" }, "frameWidthPrices": { "1": "1.2", "0.75": "0.9" }, "backupRenderColor": "#000000", "frameCollectionId": "6", "profileDescription": "A sleek and modern wood frame with a polished silver finish. This transitional profile complements a wide array of art and decor styles.", "horizontalSideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/arctic-silver-side3.jpg", "maxBorderImageSlice": 105, "frameWidthsAvailable": [0.75, 1], "frameWidthRabbetDepths": { "1": "0.125", "0.75": "0.125" }, "frameWidthTrueRabbetDepths": { "1": 1.5, "0.75": 0.875 } }, { "faceImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/espresso-face.jpg", "sideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/espresso-side.jpg", "frameColor": "Espresso", "swatchName": "espresso", "frameColorId": 17, "frameColorPrice": 39.0, "frameWidthDepths": { "0.75": "1.0", "1.125": "1.0" }, "frameWidthPrices": { "0.75": "0.45", "1.125": "0.55" }, "backupRenderColor": "#000000", "frameCollectionId": "5", "profileDescription": "A darker alternative to our Walnut. The earthy tone in this profile contains flecks of black running throughout the grain pattern.", "horizontalSideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/espresso-side.jpg", "maxBorderImageSlice": 100, "frameWidthsAvailable": [0.75, 1.125], "frameWidthRabbetDepths": { "0.75": "0.125", "1.125": "0.125" }, "frameWidthTrueRabbetDepths": { "0.75": 1.063, "1.125": 1.063 } }, { "faceImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/cloud-gray-face5.jpg", "sideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/cloud-gray-side5.jpg", "frameColor": "Cloud Gray", "swatchName": "cloud-gray", "frameColorId": 13, "frameColorPrice": 39.0, "frameWidthDepths": { "0.75": "1.0", "1.125": "1.0" }, "frameWidthPrices": { "0.75": "0.45", "1.125": "0.55" }, "backupRenderColor": "#000000", "frameCollectionId": "5", "profileDescription": "This polished grey profile is a nice balance of modern and classic, and works well across photos or prints that call for a lighter tone.", "horizontalSideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/cloud-gray-side5.jpg", "maxBorderImageSlice": 80, "frameWidthsAvailable": [0.75, 1.125], "frameWidthRabbetDepths": { "0.75": "0.125", "1.125": "0.125" }, "frameWidthTrueRabbetDepths": { "0.75": 1.063, "1.125": 1.063 } }, { "faceImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/midnight-black-face2.jpg", "sideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/midnight-black-side3.jpg", "frameColor": "Slate Black", "swatchName": "midnight-black", "frameColorId": 14, "frameColorPrice": 39.0, "frameWidthDepths": { "0.75": "1.0", "1.125": "1.0" }, "frameWidthPrices": { "0.75": "0.45", "1.125": "0.55" }, "backupRenderColor": "#000000", "frameCollectionId": "5", "profileDescription": "A darker frame with a little more character and texture than our standard gallery style black, pairs well with most anything.", "horizontalSideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/midnight-black-side3.jpg", "maxBorderImageSlice": 135, "frameWidthsAvailable": [0.75, 1.125], "frameWidthRabbetDepths": { "0.75": "0.125", "1.125": "0.125" }, "frameWidthTrueRabbetDepths": { "0.75": 1.063, "1.125": 1.063 } }, { "faceImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/sandstone-face.jpg", "sideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/sandstone-side2.jpg", "frameColor": "Sandstone", "swatchName": "sandstone2", "frameColorId": 15, "frameColorPrice": 39.0, "frameWidthDepths": { "0.75": "1.0", "1.125": "1.0" }, "frameWidthPrices": { "0.75": "0.45", "1.125": "0.55" }, "backupRenderColor": "#000000", "frameCollectionId": "5", "profileDescription": "Similar in tone to the Natural Maple, with subtle grain lines that give off a sophisticated but slightly raw, unfinished look.", "horizontalSideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/sandstone-side2.jpg", "maxBorderImageSlice": 106, "frameWidthsAvailable": [0.75, 1.125], "frameWidthRabbetDepths": { "0.75": "0.125", "1.125": "0.125" }, "frameWidthTrueRabbetDepths": { "0.75": 1.063, "1.125": 1.063 } }, { "faceImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/milk-chocolate-face5.jpg", "sideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/hazelnut-side.jpg", "frameColor": "Hazelnut", "swatchName": "hazelnut", "frameColorId": 16, "frameColorPrice": 39.0, "frameWidthDepths": { "0.75": "1.0", "1.125": "1.0" }, "frameWidthPrices": { "0.75": "0.45", "1.125": "0.55" }, "backupRenderColor": "#000000", "frameCollectionId": "5", "profileDescription": "A soft and alluring shade of brown with silky mousse tones and a light, finespun grain.", "horizontalSideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/hazelnut-side.jpg", "maxBorderImageSlice": 100, "frameWidthsAvailable": [0.75, 1.125], "frameWidthRabbetDepths": { "0.75": "0.125", "1.125": "0.125" }, "frameWidthTrueRabbetDepths": { "0.75": 1.063, "1.125": 1.063 } }, { "faceImage": "", "sideImage": "", "frameColor": "Coffee Brown", "swatchName": "", "frameColorId": 18, "frameColorPrice": 39.0, "frameWidthDepths": { "1.75": "0.875" }, "frameWidthPrices": { "1.75": "0.64" }, "backupRenderColor": "#000000", "frameCollectionId": "", "profileDescription": "", "horizontalSideImage": "", "maxBorderImageSlice": 30, "frameWidthsAvailable": [1.75], "frameWidthRabbetDepths": { "1.75": "0.125" }, "frameWidthTrueRabbetDepths": { "1.75": 0.625 } }, { "faceImage": "", "sideImage": "", "frameColor": "Natural Walnut Shadowbox", "swatchName": "", "frameColorId": 51, "frameColorPrice": 0.0, "frameWidthDepths": { "0.75": "1.625" }, "frameWidthPrices": { "0.75": "1.2" }, "backupRenderColor": "#000000", "frameCollectionId": "", "profileDescription": "", "horizontalSideImage": "", "maxBorderImageSlice": 30, "frameWidthsAvailable": [0.75], "frameWidthRabbetDepths": { "0.75": "0.125" }, "frameWidthTrueRabbetDepths": { "0.75": 1.375 } }, { "faceImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/mercury-new-face.jpg", "sideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/gold-alloy-side3.jpg", "frameColor": "Mercury", "swatchName": "mercury", "frameColorId": 52, "frameColorPrice": 0.0, "frameWidthDepths": { "1": "2.0", "0.75": "1.375" }, "frameWidthPrices": { "1": "0.8", "0.75": "0.7" }, "backupRenderColor": "#000000", "frameCollectionId": "4", "profileDescription": "Featuring a dark metal finish with iridescent patina, this modern frame combines an angled metallic face and a brushed wood side. ", "horizontalSideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/gold-alloy-side3.jpg", "maxBorderImageSlice": 110, "frameWidthsAvailable": [0.75, 1], "frameWidthRabbetDepths": { "1": "0.125", "0.75": "0.125" }, "frameWidthTrueRabbetDepths": { "1": 1.3125, "0.75": 0.875 } }, { "faceImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/gold-alloy-face2.jpg", "sideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/gold-alloy-side3.jpg", "frameColor": "Soft Gold", "swatchName": "soft-gold", "frameColorId": 53, "frameColorPrice": 0.0, "frameWidthDepths": { "1": "2.0", "0.75": "1.375" }, "frameWidthPrices": { "1": "0.8", "0.75": "0.7" }, "backupRenderColor": "#000000", "frameCollectionId": "4", "profileDescription": "A soft gold face paired with a brushed wood side. The angled face and light patina give this frame a modern rustic look. ", "horizontalSideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/gold-alloy-side3.jpg", "maxBorderImageSlice": 30, "frameWidthsAvailable": [0.75, 1], "frameWidthRabbetDepths": { "1": "0.125", "0.75": "0.125" }, "frameWidthTrueRabbetDepths": { "1": 1.3125, "0.75": 0.875 } }, { "faceImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/nickel-nice-face2.jpg", "sideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/gold-alloy-side3.jpg", "frameColor": "Nickel", "swatchName": "nickel2", "frameColorId": 54, "frameColorPrice": 0.0, "frameWidthDepths": { "1": "2.0", "0.75": "1.375" }, "frameWidthPrices": { "1": "0.8", "0.75": "0.7" }, "backupRenderColor": "#000000", "frameCollectionId": "4", "profileDescription": "A matte silver face complemented by a brushed wood side. The light patina and angled shape give this frame a softened industrial look. ", "horizontalSideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/gold-alloy-side3.jpg", "maxBorderImageSlice": 107, "frameWidthsAvailable": [0.75, 1], "frameWidthRabbetDepths": { "1": "0.125", "0.75": "0.125" }, "frameWidthTrueRabbetDepths": { "1": 1.3125, "0.75": 0.875 } }, { "faceImage": "", "sideImage": "", "frameColor": "33 Black", "swatchName": "", "frameColorId": 55, "frameColorPrice": 0.0, "frameWidthDepths": {}, "frameWidthPrices": {}, "backupRenderColor": "#000000", "frameCollectionId": "", "profileDescription": "", "horizontalSideImage": "", "maxBorderImageSlice": 30, "frameWidthsAvailable": [], "frameWidthRabbetDepths": {}, "frameWidthTrueRabbetDepths": {} }, { "faceImage": "", "sideImage": "", "frameColor": "34 Silver", "swatchName": "", "frameColorId": 56, "frameColorPrice": 0.0, "frameWidthDepths": {}, "frameWidthPrices": {}, "backupRenderColor": "#000000", "frameCollectionId": "", "profileDescription": "", "horizontalSideImage": "", "maxBorderImageSlice": 30, "frameWidthsAvailable": [], "frameWidthRabbetDepths": {}, "frameWidthTrueRabbetDepths": {} }, { "faceImage": "", "sideImage": "", "frameColor": "34 Maple", "swatchName": "", "frameColorId": 57, "frameColorPrice": 0.0, "frameWidthDepths": {}, "frameWidthPrices": {}, "backupRenderColor": "#000000", "frameCollectionId": "", "profileDescription": "", "horizontalSideImage": "", "maxBorderImageSlice": 30, "frameWidthsAvailable": [], "frameWidthRabbetDepths": {}, "frameWidthTrueRabbetDepths": {} }, { "faceImage": "", "sideImage": "", "frameColor": "34 Matte Black", "swatchName": "", "frameColorId": 58, "frameColorPrice": 0.0, "frameWidthDepths": {}, "frameWidthPrices": {}, "backupRenderColor": "#000000", "frameCollectionId": "", "profileDescription": "", "horizontalSideImage": "", "maxBorderImageSlice": 30, "frameWidthsAvailable": [], "frameWidthRabbetDepths": {}, "frameWidthTrueRabbetDepths": {} }, { "faceImage": "", "sideImage": "", "frameColor": "None", "swatchName": "", "frameColorId": 59, "frameColorPrice": 0.0, "frameWidthDepths": { "0": "0.0", "0.75": "1.0" }, "frameWidthPrices": { "0": "0.0", "0.75": "0.0" }, "backupRenderColor": "#000000", "frameCollectionId": "", "profileDescription": "", "horizontalSideImage": "", "maxBorderImageSlice": 40, "frameWidthsAvailable": [0, 0.75], "frameWidthRabbetDepths": { "0": "0.0", "0.75": "0.125" }, "frameWidthTrueRabbetDepths": { "0": 0.0, "0.75": 0.0 } }, { "faceImage": "", "sideImage": "", "frameColor": "Kota Coffee Brown", "swatchName": "", "frameColorId": 62, "frameColorPrice": 0.0, "frameWidthDepths": { "0.75": "1.25" }, "frameWidthPrices": { "0.75": "0.5" }, "backupRenderColor": "#000000", "frameCollectionId": "", "profileDescription": "", "horizontalSideImage": "", "maxBorderImageSlice": 30, "frameWidthsAvailable": [0.75], "frameWidthRabbetDepths": { "0.75": "0.125" }, "frameWidthTrueRabbetDepths": { "0.75": 1.0 } }, { "faceImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/lancaster-dark-face.jpg", "sideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/lancaster-dark-side2.jpg", "frameColor": "Princeton Black", "swatchName": "", "frameColorId": 63, "frameColorPrice": 0.0, "frameWidthDepths": { "0.75": "1.625" }, "frameWidthPrices": { "0.75": "0.55" }, "backupRenderColor": "#000000", "frameCollectionId": "", "profileDescription": "", "horizontalSideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/lancaster-dark-horizontal.jpg", "maxBorderImageSlice": 90, "frameWidthsAvailable": [0.75], "frameWidthRabbetDepths": { "0.75": "0.125" }, "frameWidthTrueRabbetDepths": { "0.75": 1.25 } }, { "faceImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/natural-walnut-face2-darker.jpg", "sideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/walnut-darker-side2.jpg", "frameColor": "Gallery Walnut", "swatchName": "", "frameColorId": 64, "frameColorPrice": 0.0, "frameWidthDepths": { "0.75": "1.5" }, "frameWidthPrices": { "0.75": "0.45" }, "backupRenderColor": "#000000", "frameCollectionId": "", "profileDescription": "", "horizontalSideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/walnut-horizontal.jpg", "maxBorderImageSlice": 76, "frameWidthsAvailable": [0.75], "frameWidthRabbetDepths": { "0.75": "0.125" }, "frameWidthTrueRabbetDepths": { "0.75": 1.25 } }, { "faceImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/white-frame-vector2.jpg", "sideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/white-vector-side.jpg", "frameColor": "Shadowbox White", "swatchName": "", "frameColorId": 69, "frameColorPrice": 0.0, "frameWidthDepths": { "1": "2.125" }, "frameWidthPrices": { "1": "0.9" }, "backupRenderColor": "#000000", "frameCollectionId": "", "profileDescription": "", "horizontalSideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/white-frame-side3.jpg", "maxBorderImageSlice": 135, "frameWidthsAvailable": [1], "frameWidthRabbetDepths": { "1": "0.125" }, "frameWidthTrueRabbetDepths": { "1": 2.0 } }, { "faceImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/black-frame-face17.jpg", "sideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/black-vector-side9.jpg", "frameColor": "Shadowbox Black", "swatchName": "", "frameColorId": 70, "frameColorPrice": 0.0, "frameWidthDepths": { "1": "2.125" }, "frameWidthPrices": { "1": "0.9" }, "backupRenderColor": "#000000", "frameCollectionId": "", "profileDescription": "", "horizontalSideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/black-frame-horizontal-side.jpg", "maxBorderImageSlice": 85, "frameWidthsAvailable": [1], "frameWidthRabbetDepths": { "1": "0.125" }, "frameWidthTrueRabbetDepths": { "1": 2.0 } }, { "faceImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/natural-frame-face.jpg", "sideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/natural-maple-side2.jpg", "frameColor": "Natural Maple Shadowbox", "swatchName": "", "frameColorId": 71, "frameColorPrice": 0.0, "frameWidthDepths": { "1": "2.0" }, "frameWidthPrices": { "1": "1.2" }, "backupRenderColor": "#000000", "frameCollectionId": "", "profileDescription": "", "horizontalSideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/natural-maple-horizontal.jpg", "maxBorderImageSlice": 33, "frameWidthsAvailable": [1], "frameWidthRabbetDepths": { "1": "0.125" }, "frameWidthTrueRabbetDepths": { "1": 1.75 } }, { "faceImage": "", "sideImage": "", "frameColor": "Gunmetal Grey", "swatchName": "", "frameColorId": 72, "frameColorPrice": 0.0, "frameWidthDepths": {}, "frameWidthPrices": {}, "backupRenderColor": "#000000", "frameCollectionId": "", "profileDescription": "", "horizontalSideImage": "", "maxBorderImageSlice": 30, "frameWidthsAvailable": [], "frameWidthRabbetDepths": {}, "frameWidthTrueRabbetDepths": {} }, { "faceImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/gold-alloy-face2.jpg", "sideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/gold-alloy-side3.jpg", "frameColor": "Champagne", "swatchName": "", "frameColorId": 73, "frameColorPrice": 0.0, "frameWidthDepths": {}, "frameWidthPrices": {}, "backupRenderColor": "#000000", "frameCollectionId": "", "profileDescription": "A darker gold face paired with a brushed wood side. The angled face and light patina give this frame a modern rustic look.", "horizontalSideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/gold-alloy-side3.jpg", "maxBorderImageSlice": 30, "frameWidthsAvailable": [], "frameWidthRabbetDepths": {}, "frameWidthTrueRabbetDepths": {} }, { "faceImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/black-frame-face17.jpg", "sideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/black-vector-side9.jpg", "frameColor": "Slim Black", "swatchName": "", "frameColorId": 74, "frameColorPrice": 0.0, "frameWidthDepths": { "0.5": "1.25" }, "frameWidthPrices": { "0.5": "0.43" }, "backupRenderColor": "#000000", "frameCollectionId": "", "profileDescription": "", "horizontalSideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/black-frame-horizontal-side.jpg", "maxBorderImageSlice": 85, "frameWidthsAvailable": [0.5], "frameWidthRabbetDepths": { "0.5": "0.125" }, "frameWidthTrueRabbetDepths": { "0.5": 1.0 } }, { "faceImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/white-frame-vector2.jpg", "sideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/white-vector-side.jpg", "frameColor": "Slim White", "swatchName": "", "frameColorId": 75, "frameColorPrice": 0.0, "frameWidthDepths": { "0.5": "1.25" }, "frameWidthPrices": { "0.5": "0.43" }, "backupRenderColor": "#000000", "frameCollectionId": "", "profileDescription": "", "horizontalSideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/white-frame-side3.jpg", "maxBorderImageSlice": 135, "frameWidthsAvailable": [0.5], "frameWidthRabbetDepths": { "0.5": "0.125" }, "frameWidthTrueRabbetDepths": { "0.5": 1.0 } }, { "faceImage": "", "sideImage": "", "frameColor": "Ornate Gold", "swatchName": "", "frameColorId": 76, "frameColorPrice": 0.0, "frameWidthDepths": {}, "frameWidthPrices": {}, "backupRenderColor": "#000000", "frameCollectionId": "", "profileDescription": "Antique Gold Scoop with Beaded Lip ", "horizontalSideImage": "", "maxBorderImageSlice": 30, "frameWidthsAvailable": [], "frameWidthRabbetDepths": {}, "frameWidthTrueRabbetDepths": {} }, { "faceImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/burlwood-blonde-face.webp", "sideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/burlwood-blond-side.jpg", "frameColor": "Burlwood Blonde", "swatchName": "burlwood-blonde", "frameColorId": 77, "frameColorPrice": 0.0, "frameWidthDepths": { "0.75": "1.25", "1.25": "0.875" }, "frameWidthPrices": { "0.75": "0.85", "1.25": "0.95" }, "backupRenderColor": "#000000", "frameCollectionId": "10", "profileDescription": "A burlwood veneer face with maple tones brings a warm, organic touch, while natural wood sides add a hint of vintage character.", "horizontalSideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/burlwood-blond-side.jpg", "maxBorderImageSlice": 88, "frameWidthsAvailable": [0.75, 1.25], "frameWidthRabbetDepths": { "0.75": "0.125", "1.25": "0.125" }, "frameWidthTrueRabbetDepths": { "0.75": 1.0, "1.25": 0.5 } }, { "faceImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/burlwood-face3.webp", "sideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/burlwood-brunette-side.jpg", "frameColor": "Burlwood Brunette", "swatchName": "burlwood-brunette2", "frameColorId": 78, "frameColorPrice": 0.0, "frameWidthDepths": { "0.75": "1.25", "1.25": "0.875" }, "frameWidthPrices": { "0.75": "0.85", "1.25": "0.95" }, "backupRenderColor": "#000000", "frameCollectionId": "10", "profileDescription": "A burlwood veneer face with warm brown tones lends sophistication, while stained wood sides complete a grounded, classic look.", "horizontalSideImage": "https://d29mtkonxnc5fw.cloudfront.net/site_assets/burlwood-brunette-side.jpg", "maxBorderImageSlice": 80, "frameWidthsAvailable": [0.75, 1.25], "frameWidthRabbetDepths": { "0.75": "0.125", "1.25": "0.125" }, "frameWidthTrueRabbetDepths": { "0.75": 1.0, "1.25": 0.5 } }], "totalItems": 44, "cyclePosition": 0, "optionsIdIndex": { "2": 1, "3": 2, "5": 3, "6": 0, "7": 4, "8": 5, "9": 6, "10": 7, "11": 9, "12": 8, "13": 17, "14": 18, "15": 19, "16": 20, "17": 16, "18": 21, "51": 22, "52": 23, "53": 24, "54": 25, "55": 26, "56": 27, "57": 28, "58": 29, "59": 30, "60": 13, "61": 12, "62": 31, "63": 32, "64": 33, "65": 15, "66": 14, "67": 11, "68": 10, "69": 34, "70": 35, "71": 36, "72": 37, "73": 38, "74": 39, "75": 40, "76": 41, "77": 42, "78": 43 }, "optionsDataIndex": { "None": 30, "Nickel": 25, "Mercury": 23, "33 Black": 26, "34 Maple": 28, "Espresso": 16, "Hazelnut": 20, "34 Silver": 27, "Champagne": 38, "Sandstone": 19, "Soft Gold": 24, "Cloud Gray": 17, "Kota Black": 13, "Kota Pecan": 10, "Slim Black": 39, "Slim White": 40, "Black Maple": 0, "Kota Cherry": 11, "Kota Walnut": 12, "Ornate Gold": 41, "Sahara Gold": 14, "Slate Black": 18, "White Maple": 1, "Coffee Brown": 21, "Academie Gold": 8, "Arctic Silver": 15, "Gunmetal Grey": 37, "Natural Maple": 2, "34 Matte Black": 29, "Academie Black": 7, "Gallery Walnut": 33, "Natural Walnut": 3, "Weathered Grey": 5, "Academie Silver": 9, "Burlwood Blonde": 42, "Princeton Black": 32, "Shadowbox Black": 35, "Shadowbox White": 34, "Weathered Black": 4, "Burlwood Brunette": 43, "Kota Coffee Brown": 31, "Weathered Natural": 6, "Natural Maple Shadowbox": 36, "Natural Walnut Shadowbox": 22 } } };
+    </script>
+    <script>
+      (function includeBaseFrameWidthsForProfiles() {
+        if (!optionsData || !optionsData.frameProfiles || !optionsData.frameProfiles.options) {
+          return;
+        }
+
+        var requiredWidths = [0.5, 0.75, 1, 1.625];
+
+        function setFallbackValue(map, key, fallbackKey) {
+          if (map[key] === undefined && map[fallbackKey] !== undefined) {
+            map[key] = map[fallbackKey];
+          }
+        }
+
+        optionsData.frameProfiles.options.forEach(function(profile) {
+          profile.frameWidthsAvailable = Array.isArray(profile.frameWidthsAvailable)
+            ? profile.frameWidthsAvailable.slice()
+            : [];
+
+          profile.frameWidthDepths = profile.frameWidthDepths || {};
+          profile.frameWidthPrices = profile.frameWidthPrices || {};
+          profile.frameWidthRabbetDepths = profile.frameWidthRabbetDepths || {};
+          profile.frameWidthTrueRabbetDepths = profile.frameWidthTrueRabbetDepths || {};
+
+          setFallbackValue(profile.frameWidthDepths, "0.5", "0.75");
+          setFallbackValue(profile.frameWidthDepths, "1", "0.75");
+          setFallbackValue(profile.frameWidthPrices, "0.5", "0.75");
+          setFallbackValue(profile.frameWidthPrices, "1", "0.75");
+          setFallbackValue(profile.frameWidthRabbetDepths, "0.5", "0.75");
+          setFallbackValue(profile.frameWidthRabbetDepths, "1", "0.75");
+          setFallbackValue(profile.frameWidthTrueRabbetDepths, "0.5", "0.75");
+          setFallbackValue(profile.frameWidthTrueRabbetDepths, "1", "0.75");
+
+          requiredWidths.forEach(function(width) {
+            if (profile.frameWidthsAvailable.indexOf(width) === -1) {
+              profile.frameWidthsAvailable.push(width);
+            }
+          });
+
+          profile.frameWidthsAvailable.sort(function(a, b) {
+            return a - b;
+          });
+        });
+      })();
+    </script>
+
+    <div class="new_frame_editor_wrapper" style="position:relative; height:100%">
+      <div class="columns" style="border-bottom:1px solid #eee;  padding:0; margin:0;">
+        <div class="column frame_editor_wall_bg" style="padding:0px;">
+          <div class="frame_and_drawer_column">
+            <div class="frame_and_arrows_container">
+              <div class="box_container box_container_1">
+                <div class="align_center">
+                  <div class="gyroscope_loader gyroscope_loader--rings frame_loader_1_1" style="display: none;"></div>
+                </div>
+                <div
+                  class="three_d_box_container three_d_box_container_1_1 panels-backface-invisible right_side_out_shadows"
+                  style="width: 430.729px; height: 591px; transform: rotateY(-30deg); transition: transform 1s; opacity: 1;">
+                  <figure class="three_dimensional_frame three_dimensional_frame_1_1 front"
+                    style="border-image-slice: 82; width: 430.729px; height: 591px; background: transparent; box-shadow: rgba(0, 0, 0, 0.7) 0px 2px 5px inset; transform: translateZ(0px); border-style: solid; border-width: 15.0254px; border-image-source: url(&quot;https://d29mtkonxnc5fw.cloudfront.net/site_assets/weathered-natural-face-2.jpg&quot;); border-image-width: 15.0254px; border-image-repeat: stretch;">
+                    <div class="overlay_gradient overlay_gradient_1_1"
+                      style="display: block; opacity: 0; width: 401px; height: 561px; margin-top: 0px; margin-left: 0px;">
+                    </div>
+                  </figure>
+
+                  <figure class="artwork_layers"
+                    style="display: inline-block; background: rgb(255, 255, 255); width: 320.542px; height: 480.814px; top: 55.0932px; left: 55.0932px; transform: rotateY(0deg) translateZ(-2.00339px) translateY(0px) translateX(0px);">
+                    <div class="artwork_layer artwork_layer_1"
+                      style="position: absolute; display: inline-block; background: url(&quot;https://d29mtkonxnc5fw.cloudfront.net/site_assets/nautylus-watermark-beige.png&quot;) center 48% / 64.2px no-repeat rgb(51, 51, 51); z-index: 100; margin-top: 0px; margin-left: 0px; width: 320.542px; height: 480.814px; box-shadow: rgb(241, 241, 241) 1px -1px 0px 1px inset, rgb(240, 240, 240) -1px 1px 0px 1px inset;">
+                    </div>
+                  </figure>
+
+                  <figure class="front_mount three_d_face"
+                    style="background: rgb(255, 255, 255); width: 400.678px; height: 560.949px; top: 15.0254px; left: 15.0254px; transform: rotateY(0deg) translateZ(-2.50424px) translateY(0px) translateX(0px); opacity: 1;">
+                  </figure>
+                  <figure class="right three_d_face"
+                    style="background: url(&quot;https://d29mtkonxnc5fw.cloudfront.net/site_assets/weathered-natural-side-large4.jpg&quot;) round; width: 22.5381px; height: 591px; left: 408.191px; transform: rotateY(90deg) translateZ(11.2691px) translateY(0px) translateX(11.2691px);">
+                  </figure>
+                  <figure class="left three_d_face"
+                    style="background: url(&quot;https://d29mtkonxnc5fw.cloudfront.net/site_assets/weathered-natural-side-large4.jpg&quot;) round; width: 22.5381px; height: 591px; transform: rotateY(90deg) translateZ(-11.2691px) translateY(0px) translateX(11.2691px);">
+                  </figure>
+                  <figure class="back three_d_face"
+                    style="border-image-slice: 82; width: 430.729px; height: 591px; border-style: solid; border-width: 15.0254px; border-image-source: url(&quot;https://d29mtkonxnc5fw.cloudfront.net/site_assets/weathered-natural-face-2.jpg&quot;); border-image-width: 15.0254px; border-image-repeat: stretch; box-shadow: rgba(0, 0, 0, 0.5) 0px 1px 20px 1px inset; transform: rotateY(0deg) translateZ(-22.5381px) translateY(0px) translateX(0px);">
+                    <div class="back_frame_shadows"
+                      style="opacity: 1; top: -15.0254px; left: -15.0254px; width: 430.729px; height: 591px;"></div>
+                  </figure>
+                  <figure class="top three_d_face"></figure>
+                  <figure class="bottom three_d_face"></figure>
+
+                  <figure class="top_inner three_d_face"></figure>
+                  <figure class="right_inner three_d_face"
+                    style="background: url(&quot;https://d29mtkonxnc5fw.cloudfront.net/site_assets/weathered-natural-side-large4.jpg&quot;) round; width: 22.5381px; height: 560.949px; top: 15.0254px; left: 393.165px; transform: rotateY(90deg) translateZ(11.2691px) translateY(0px) translateX(11.2691px);">
+                  </figure>
+                  <figure class="bottom_inner three_d_face"></figure>
+                  <figure class="left_inner three_d_face"
+                    style="background: url(&quot;https://d29mtkonxnc5fw.cloudfront.net/site_assets/weathered-natural-side-large4.jpg&quot;) round; width: 22.5381px; height: 560.949px; top: 15.0254px; left: 15.0254px; transform: rotateY(90deg) translateZ(-11.2691px) translateY(0px) translateX(11.2691px);">
+                  </figure>
+
+                  <!-- only show when frame rotation at 0 degrees. Hide back frame shadows. Because otherwise on small 5x5 frame, the frame depth is so large that the back frame shadows don't show at all. Need to attach to the front -->
+                  <div class="front_frame_shadows"></div>
+                </div>
+              </div>
+
+            </div>
+
+            <a href="https://www.levelframes.com/framed-art-visualizer?srsltid=AfmBOoqkIqw9a_YK674lcG8xouHZ3Q2CSJFwEcMq2ThLG9Fd41HVGDDe#"
+              class="mobile_frame_editor_arrow cycle_profile  mobile_left_frame_arrow show_on_mobile_editor_only"
+              data-direction="previous" aria-label="Previous frame">&#10094;</a>
+
+            <a href="https://www.levelframes.com/framed-art-visualizer?srsltid=AfmBOoqkIqw9a_YK674lcG8xouHZ3Q2CSJFwEcMq2ThLG9Fd41HVGDDe#"
+              class="mobile_frame_editor_arrow cycle_profile  mobile_right_frame_arrow show_on_mobile_editor_only"
+              data-direction="next" aria-label="Next frame">&#10095;</a>
+
+            <div class="thumb_white_bottom_drawer show_on_desktop_editor_only">
+              <div class="small_profile_thumbs_new_editor">
+                <a href="https://www.levelframes.com/framed-art-visualizer?srsltid=AfmBOoqkIqw9a_YK674lcG8xouHZ3Q2CSJFwEcMq2ThLG9Fd41HVGDDe#"
+                  class="circular_change_profile_btn cycle_profile" data-direction="previous"
+                  aria-label="Previous frame">&#10094;</a>
+
+                <span class="generate_profile_thumbs"><span class="profile_photos_gallery">
+                    <a href="https://d29mtkonxnc5fw.cloudfront.net/thumbs/vkAmS-j5zCjwESz0phUMyw.jpg"
+                      class="corner-shot">
+                      <img src="./assets/images/image-020.jpg"
+                        alt="Custom picture frame profile - Level Frames">
+                    </a>
+                    <a href="https://d29mtkonxnc5fw.cloudfront.net/thumbs/9tO6_2U0HUUf784DKhaiTw.jpg"
+                      class="corner-shot">
+                      <img src="./assets/images/image-024.jpg"
+                        alt="Custom picture frame profile - Level Frames">
+                    </a>
+                    <a href="https://d29mtkonxnc5fw.cloudfront.net/thumbs/u4fUC6UoJ-cgGCe-rl_wHw.jpg"
+                      class="corner-shot">
+                      <img src="./assets/images/image-054.jpg"
+                        alt="Custom picture frame profile - Level Frames">
+                    </a>
+                  </span>
+
+                  <script>
+                    $(document).ready(function () {
+                      $('.profile_photos_gallery').magnificPopup({
+                        delegate: 'a', // the selector for gallery item
+                        type: 'image',
+                        gallery: {
+                          enabled: true
+                        }
+                      });
+                    });
+                  </script>
+                </span>
+
+                <a href="https://www.levelframes.com/framed-art-visualizer?srsltid=AfmBOoqkIqw9a_YK674lcG8xouHZ3Q2CSJFwEcMq2ThLG9Fd41HVGDDe#"
+                  class="circular_change_profile_btn cycle_profile" data-direction="next" style="margin-left:-2px;"
+                  aria-label="Next frame">&#10095;</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="column is-5 white_sidebar_bg" style="padding:0px">
+          <div class="white_sidebar_padding">
+            <h1 class="visualizer-editor-title m-top-10">Frame Preview Studio</h1>
+
+            <h2 class="frame_editor_summary visualizer-summary">Present your artwork with clean, gallery-style frame mockups.
+              Built for artists, photographers, and design professionals.</h2>
+
+            <div class="m-top-20"></div>
+            <a href="https://www.levelframes.com/framed-art-visualizer?srsltid=AfmBOoqkIqw9a_YK674lcG8xouHZ3Q2CSJFwEcMq2ThLG9Fd41HVGDDe#"
+              class="btn huge_square_btn huge_square_btn--blue upload_illustrator_image original_illustrator_upload_btn"> &nbsp;Upload Artwork</a>
+
+            <div class="illustrator_post_upload_content">
+              <p class="frame_editor_summary visualizer-summary"><a
+                  href="https://www.levelframes.com/framed-art-visualizer?srsltid=AfmBOoqkIqw9a_YK674lcG8xouHZ3Q2CSJFwEcMq2ThLG9Fd41HVGDDe#"
+                  class="upload_illustrator_image link_underline">Upload New
+                  Image</a></p>
+              <p id="wd-upload-status" class="frame_editor_summary visualizer-summary" style="display:none; font-size:13px; margin-top:6px; font-weight:600;"></p>
+            </div>
+
+            <div class="m-top-20"></div>
+            <span class="white_sidebar_section_label">
+              Select Artwork Size <button class="regular_tooltip frame_controls_info_bubble tooltipstered"
+                style="border:none; outline:none; background:none;"></button>
+            </span>
+            <div class="m-top-10"></div>
+            <label for="visualizer-artwork-size" class="visualizer_select_box_label_style">
+              <select name="" class="regular_select_box_padding_and_font visualizer_select_box_style"
+                id="visualizer-artwork-size">
+              </select>
+            </label>
+            <label for="visualizer-artwork-width" class="visualizer_select_box_label_style"
+              style="display:none;">
+              <select name="" class="regular_select_box_padding_and_font visualizer_select_box_style"
+                id="visualizer-artwork-width">
+                <option value="4">4"</option>
+                <option value="5">5"</option>
+                <option value="6">6"</option>
+                <option value="7">7"</option>
+                <option value="8">8"</option>
+                <option value="9">9"</option>
+                <option value="10">10"</option>
+                <option value="11">11"</option>
+                <option value="12">12"</option>
+                <option value="13">13"</option>
+                <option value="14">14"</option>
+                <option value="15">15"</option>
+                <option value="16" selected="">16"</option>
+                <option value="17">17"</option>
+                <option value="18">18"</option>
+                <option value="19">19"</option>
+                <option value="20">20"</option>
+                <option value="21">21"</option>
+                <option value="22">22"</option>
+                <option value="23">23"</option>
+                <option value="24">24"</option>
+                <option value="25">25"</option>
+                <option value="26">26"</option>
+                <option value="27">27"</option>
+                <option value="28">28"</option>
+                <option value="29">29"</option>
+                <option value="30">30"</option>
+                <option value="31">31"</option>
+                <option value="32">32"</option>
+                <option value="33">33"</option>
+                <option value="34">34"</option>
+                <option value="35">35"</option>
+                <option value="36">36"</option>
+                <option value="37">37"</option>
+                <option value="38">38"</option>
+                <option value="39">39"</option>
+                <option value="40">40"</option>
+              </select>
+            </label>
+            <span class="visualizer_dimension_separator" style="display:none;">x</span>
+            <label for="visualizer-artwork-height" class="visualizer_select_box_label_style"
+              style="display:none;">
+              <select name="" class="regular_select_box_padding_and_font visualizer_select_box_style"
+                id="visualizer-artwork-height">
+                <option value="4">4"</option>
+                <option value="5">5"</option>
+                <option value="6">6"</option>
+                <option value="7">7"</option>
+                <option value="8">8"</option>
+                <option value="9">9"</option>
+                <option value="10">10"</option>
+                <option value="11">11"</option>
+                <option value="12">12"</option>
+                <option value="13">13"</option>
+                <option value="14">14"</option>
+                <option value="15">15"</option>
+                <option value="16">16"</option>
+                <option value="17">17"</option>
+                <option value="18">18"</option>
+                <option value="19">19"</option>
+                <option value="20">20"</option>
+                <option value="21">21"</option>
+                <option value="22">22"</option>
+                <option value="23">23"</option>
+                <option value="24" selected="">24"</option>
+                <option value="25">25"</option>
+                <option value="26">26"</option>
+                <option value="27">27"</option>
+                <option value="28">28"</option>
+                <option value="29">29"</option>
+                <option value="30">30"</option>
+                <option value="31">31"</option>
+                <option value="32">32"</option>
+                <option value="33">33"</option>
+                <option value="34">34"</option>
+                <option value="35">35"</option>
+                <option value="36">36"</option>
+                <option value="37">37"</option>
+                <option value="38">38"</option>
+                <option value="39">39"</option>
+                <option value="40">40"</option>
+              </select>
+            </label>
+
+            <div class="m-top-20"></div>
+            <div class="scenes_controls_section">
+              <span class="white_sidebar_section_label">
+                Choose a Scene Background <button class="regular_tooltip frame_controls_info_bubble tooltipstered"
+                  style="border:none; outline:none; background:none;"></button>
+              </span>
+
+              <div class="m-top-10"></div>
+              <a href="https://www.levelframes.com/framed-art-visualizer?srsltid=AfmBOoqkIqw9a_YK674lcG8xouHZ3Q2CSJFwEcMq2ThLG9Fd41HVGDDe#"
+                class="scene_control_swatch regular_tooltip  active_scene_swatch tooltipstered" data-scene-name="white">
+                <span class="scene_swatch_wrapper">
+                  <img src="./assets/images/image-064.jpg">
+                </span>
+              </a>
+
+            </div>
+
+            <div class="m-top-20"></div>
+            <div class="frame_style_controls_section">
+              <span class="white_sidebar_section_label">
+                Frame Style
+              </span>
+
+              <div class="m-top-10"></div>
+              <div class="profile_swatches">
+                <a href="https://www.levelframes.com/framed-art-visualizer?srsltid=AfmBOoqkIqw9a_YK674lcG8xouHZ3Q2CSJFwEcMq2ThLG9Fd41HVGDDe#"
+                  data-frame-color-id="6" class="profile_swatch_link profile_id_6 regular_tooltip tooltipstered"
+                  role="button">
+                  <img src="./assets/images/image-012.jpg" alt="swatch">
+                </a>
+                <a href="https://www.levelframes.com/framed-art-visualizer?srsltid=AfmBOoqkIqw9a_YK674lcG8xouHZ3Q2CSJFwEcMq2ThLG9Fd41HVGDDe#"
+                  data-frame-color-id="2" class="profile_swatch_link profile_id_2 regular_tooltip tooltipstered"
+                  role="button">
+                  <img src="./assets/images/image-065.jpg" alt="swatch">
+                </a>
+                <a href="https://www.levelframes.com/framed-art-visualizer?srsltid=AfmBOoqkIqw9a_YK674lcG8xouHZ3Q2CSJFwEcMq2ThLG9Fd41HVGDDe#"
+                  data-frame-color-id="3" class="profile_swatch_link profile_id_3 regular_tooltip tooltipstered"
+                  role="button">
+                  <img src="./assets/images/image-045.jpg" alt="swatch">
+                </a>
+                <a href="https://www.levelframes.com/framed-art-visualizer?srsltid=AfmBOoqkIqw9a_YK674lcG8xouHZ3Q2CSJFwEcMq2ThLG9Fd41HVGDDe#"
+                  data-frame-color-id="5" class="profile_swatch_link profile_id_5 regular_tooltip tooltipstered"
+                  role="button">
+                  <img src="./assets/images/image-046.jpg" alt="swatch">
+                </a>
+                <a href="https://www.levelframes.com/framed-art-visualizer?srsltid=AfmBOoqkIqw9a_YK674lcG8xouHZ3Q2CSJFwEcMq2ThLG9Fd41HVGDDe#"
+                  data-frame-color-id="7" class="profile_swatch_link profile_id_7 regular_tooltip tooltipstered"
+                  role="button">
+                  <img src="./assets/images/image-061.jpg" alt="swatch">
+                </a>
+                <a href="https://www.levelframes.com/framed-art-visualizer?srsltid=AfmBOoqkIqw9a_YK674lcG8xouHZ3Q2CSJFwEcMq2ThLG9Fd41HVGDDe#"
+                  data-frame-color-id="8" class="profile_swatch_link profile_id_8 regular_tooltip tooltipstered"
+                  role="button">
+                  <img src="./assets/images/image-062.jpg" alt="swatch">
+                </a>
+                <a href="https://www.levelframes.com/framed-art-visualizer?srsltid=AfmBOoqkIqw9a_YK674lcG8xouHZ3Q2CSJFwEcMq2ThLG9Fd41HVGDDe#"
+                  data-frame-color-id="9"
+                  class="profile_swatch_link profile_id_9 regular_tooltip tooltipstered active_profile_swatch"
+                  role="button">
+                  <img src="./assets/images/image-063.jpg" alt="swatch">
+                </a>
+                <a href="https://www.levelframes.com/framed-art-visualizer?srsltid=AfmBOoqkIqw9a_YK674lcG8xouHZ3Q2CSJFwEcMq2ThLG9Fd41HVGDDe#"
+                  data-frame-color-id="10" class="profile_swatch_link profile_id_10 regular_tooltip tooltipstered"
+                  role="button">
+                  <img src="./assets/images/image-006.jpg" alt="swatch">
+                </a>
+                <a href="https://www.levelframes.com/framed-art-visualizer?srsltid=AfmBOoqkIqw9a_YK674lcG8xouHZ3Q2CSJFwEcMq2ThLG9Fd41HVGDDe#"
+                  data-frame-color-id="12" class="profile_swatch_link profile_id_12 regular_tooltip tooltipstered"
+                  role="button">
+                  <img src="./assets/images/image-007.jpg" alt="swatch">
+                </a>
+                <a href="https://www.levelframes.com/framed-art-visualizer?srsltid=AfmBOoqkIqw9a_YK674lcG8xouHZ3Q2CSJFwEcMq2ThLG9Fd41HVGDDe#"
+                  data-frame-color-id="11" class="profile_swatch_link profile_id_11 regular_tooltip tooltipstered"
+                  role="button">
+                  <img src="./assets/images/image-008.jpg" alt="swatch">
+                </a>
+                <a href="https://www.levelframes.com/framed-art-visualizer?srsltid=AfmBOoqkIqw9a_YK674lcG8xouHZ3Q2CSJFwEcMq2ThLG9Fd41HVGDDe#"
+                  data-frame-color-id="68" class="profile_swatch_link profile_id_68 regular_tooltip tooltipstered"
+                  role="button">
+                  <img src="./assets/images/image-039.jpg" alt="swatch">
+                </a>
+                <a href="https://www.levelframes.com/framed-art-visualizer?srsltid=AfmBOoqkIqw9a_YK674lcG8xouHZ3Q2CSJFwEcMq2ThLG9Fd41HVGDDe#"
+                  data-frame-color-id="67" class="profile_swatch_link profile_id_67 regular_tooltip tooltipstered"
+                  role="button">
+                  <img src="./assets/images/image-038.jpg" alt="swatch">
+                </a>
+                <a href="https://www.levelframes.com/framed-art-visualizer?srsltid=AfmBOoqkIqw9a_YK674lcG8xouHZ3Q2CSJFwEcMq2ThLG9Fd41HVGDDe#"
+                  data-frame-color-id="61" class="profile_swatch_link profile_id_61 regular_tooltip tooltipstered"
+                  role="button">
+                  <img src="./assets/images/image-040.jpg" alt="swatch">
+                </a>
+                <a href="https://www.levelframes.com/framed-art-visualizer?srsltid=AfmBOoqkIqw9a_YK674lcG8xouHZ3Q2CSJFwEcMq2ThLG9Fd41HVGDDe#"
+                  data-frame-color-id="60" class="profile_swatch_link profile_id_60 regular_tooltip tooltipstered"
+                  role="button">
+                  <img src="./assets/images/image-037.jpg" alt="swatch">
+                </a>
+                <a href="https://www.levelframes.com/framed-art-visualizer?srsltid=AfmBOoqkIqw9a_YK674lcG8xouHZ3Q2CSJFwEcMq2ThLG9Fd41HVGDDe#"
+                  data-frame-color-id="66" class="profile_swatch_link profile_id_66 regular_tooltip tooltipstered"
+                  role="button">
+                  <img src="./assets/images/image-055.jpg" alt="swatch">
+                </a>
+                <a href="https://www.levelframes.com/framed-art-visualizer?srsltid=AfmBOoqkIqw9a_YK674lcG8xouHZ3Q2CSJFwEcMq2ThLG9Fd41HVGDDe#"
+                  data-frame-color-id="65" class="profile_swatch_link profile_id_65 regular_tooltip tooltipstered"
+                  role="button">
+                  <img src="./assets/images/image-010.jpg" alt="swatch">
+                </a>
+                <a href="https://www.levelframes.com/framed-art-visualizer?srsltid=AfmBOoqkIqw9a_YK674lcG8xouHZ3Q2CSJFwEcMq2ThLG9Fd41HVGDDe#"
+                  data-frame-color-id="53" class="profile_swatch_link profile_id_53 regular_tooltip tooltipstered"
+                  role="button">
+                  <img src="./assets/images/image-058.jpg" alt="swatch">
+                </a>
+                <a href="https://www.levelframes.com/framed-art-visualizer?srsltid=AfmBOoqkIqw9a_YK674lcG8xouHZ3Q2CSJFwEcMq2ThLG9Fd41HVGDDe#"
+                  data-frame-color-id="54" class="profile_swatch_link profile_id_54 regular_tooltip tooltipstered"
+                  role="button">
+                  <img src="./assets/images/image-047.jpg" alt="swatch">
+                </a>
+                <a href="https://www.levelframes.com/framed-art-visualizer?srsltid=AfmBOoqkIqw9a_YK674lcG8xouHZ3Q2CSJFwEcMq2ThLG9Fd41HVGDDe#"
+                  data-frame-color-id="77" class="profile_swatch_link profile_id_77 regular_tooltip tooltipstered"
+                  role="button">
+                  <img src="./assets/images/image-013.jpg" alt="swatch">
+                </a>
+                <a href="https://www.levelframes.com/framed-art-visualizer?srsltid=AfmBOoqkIqw9a_YK674lcG8xouHZ3Q2CSJFwEcMq2ThLG9Fd41HVGDDe#"
+                  data-frame-color-id="78" class="profile_swatch_link profile_id_78 regular_tooltip tooltipstered"
+                  role="button">
+                  <img src="./assets/images/image-014.jpg" alt="swatch">
+                </a>
+              </div>
+
+              <div class="m-top-10"></div>
+              <p class="frame_editor_summary bigger_frame_editor_text" style="padding-bottom:0px; margin-bottom:3px">
+                <span class="frame_options_profile_text">Weathered Natural</span></p>
+
+              <div class="frame_width_subset_area m-top-5">
+                <form>
+                  <span style="color:#999">↳</span> with a
+                  <select name="frame_width_editor_select" class="frame_width_editor_select">
+                    <option value="0.75">0.75"</option>
+
+                    <option value="1.625">1.625"</option>
+                  </select> &nbsp;face and <span class="frame_profile_depth">1.125</span>" depth.
+                </form>
+              </div>
+
+              <div class="mobile_real_pics m-top-15">
+                <span class="generate_profile_thumbs"><span class="profile_photos_gallery">
+                    <a href="https://d29mtkonxnc5fw.cloudfront.net/thumbs/vkAmS-j5zCjwESz0phUMyw.jpg"
+                      class="corner-shot">
+                      <img src="./assets/images/image-020.jpg"
+                        alt="Custom picture frame profile - Level Frames">
+                    </a>
+                    <a href="https://d29mtkonxnc5fw.cloudfront.net/thumbs/9tO6_2U0HUUf784DKhaiTw.jpg"
+                      class="corner-shot">
+                      <img src="./assets/images/image-024.jpg"
+                        alt="Custom picture frame profile - Level Frames">
+                    </a>
+                    <a href="https://d29mtkonxnc5fw.cloudfront.net/thumbs/u4fUC6UoJ-cgGCe-rl_wHw.jpg"
+                      class="corner-shot">
+                      <img src="./assets/images/image-054.jpg"
+                        alt="Custom picture frame profile - Level Frames">
+                    </a>
+                  </span>
+
+                </span>
+              </div>
+
+              <div class="m-top-15"></div>
+              <p class="frame_editor_summary frame_options_profile_description">The sandy color and wide lines of the
+                grain in this profile bring to mind a beach house or remote cabin feel.</p>
+            </div>
+
+            <div class="matting_controls_section m-top-10">
+              <span class="white_sidebar_section_label matting_label" style="opacity: 0;">
+                Matting
+              </span>
+
+              <div class="mat_slider_and_colors_wrapper">
+                <span class="generate_mat_width_controls" style="vertical-align:top">
+                  <div id="new_mat_slider" class="noUi-target noUi-ltr noUi-horizontal noUi-txt-dir-ltr">
+                    <div class="noUi-base">
+                      <div class="noUi-connects"></div>
+                      <div class="noUi-origin" style="transform: translate(-67%, 0px); z-index: 4;">
+                        <div class="noUi-handle noUi-handle-lower" data-handle="0" tabindex="0" role="slider"
+                          aria-orientation="horizontal" aria-valuemin="0.0" aria-valuemax="6.0" aria-valuenow="2.0"
+                          aria-valuetext="2&quot; Mat">
+                          <div class="noUi-touch-area"></div>
+                          <div class="noUi-tooltip" style="display: block;">2" Mat</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </span>
+
+                <div class="mat_swatch_controls_wrapper" style="display: inline-block;">
+                  <span class="white_sidebar_section_label mat_color_desktop_label">
+                    Mat Color
+                  </span>
+
+                  <div class="mat_color_swatches mat_color_swatches_with_tooltips">
+                    <a href="https://www.levelframes.com/framed-art-visualizer?srsltid=AfmBOoqkIqw9a_YK674lcG8xouHZ3Q2CSJFwEcMq2ThLG9Fd41HVGDDe#"
+                      class="mat_control_swatch mat_color_id_1 bottom_tooltip active_mat_color_swatch tooltipstered"
+                      data-mat-color="White">
+                      <span class="mat_swatch_wrapper">
+                        <span class="solid_color_swatch" style="background-color:rgb(255, 255, 255);"></span>
+                      </span>
+                    </a>
+                    <a href="https://www.levelframes.com/framed-art-visualizer?srsltid=AfmBOoqkIqw9a_YK674lcG8xouHZ3Q2CSJFwEcMq2ThLG9Fd41HVGDDe#"
+                      class="mat_control_swatch mat_color_id_2 bottom_tooltip tooltipstered" data-mat-color="Black">
+                      <span class="mat_swatch_wrapper">
+                        <span class="solid_color_swatch" style="background-color:hsl(0, 0%, 13%);"></span>
+                      </span>
+                    </a>
+                  </div>
+                </div>
+
+                <div class="less_than_five_message">
+                  <p>Print sizes smaller than 5" require a mat due to safety concerns related to cutting the frames.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="m-top-20 p-bottom-40" style="position:relative;">
+              <span class="white_sidebar_section_label">
+                3D Rotation - Only Applies to "white" background scene
+              </span>
+              <div class="m-top-10"></div>
+              <div class="generate_rotation_controls">
+                <div id="rotation_slider"
+                  class="mat_slider--reduced_margin smaller_rotation_slider noUi-target noUi-ltr noUi-horizontal noUi-txt-dir-ltr">
+                  <div class="noUi-base">
+                    <div class="noUi-connects"></div>
+                    <div class="noUi-origin" style="transform: translate(-45.4545%, 0px); z-index: 4;">
+                      <div class="noUi-handle noUi-handle-lower" data-handle="0" tabindex="0" role="slider"
+                        aria-orientation="horizontal" aria-valuemin="0.0" aria-valuemax="55.0" aria-valuenow="30.0"
+                        aria-valuetext="30.00">
+                        <div class="noUi-touch-area"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <span class="rotation_value"></span>
+            </div>
+
+            <div class="m-top-15"></div>
+            <div class="m-top-15 mounting_controls_area">
+
+
+              <span class="white_sidebar_section_label">
+                Additional Mat Plys &amp; Colors <a
+                  href="https://www.levelframes.com/framed-art-visualizer?srsltid=AfmBOoqkIqw9a_YK674lcG8xouHZ3Q2CSJFwEcMq2ThLG9Fd41HVGDDe#mat_colors_popup"
+                  class="open-popup-link regular_tooltip frame_controls_info_bubble tooltipstered"><i
+                    class="fa fa-info-circle"></i></a>
+              </span>
+              <div class="m-top-10"></div>
+              <div class="mat_color_swatches">
+                <a href="https://www.levelframes.com/framed-art-visualizer?srsltid=AfmBOoqkIqw9a_YK674lcG8xouHZ3Q2CSJFwEcMq2ThLG9Fd41HVGDDe#"
+                  class="mat_control_swatch mat_color_id_18 bottom_tooltip tooltipstered"
+                  data-mat-color="Antique White">
+                  <span class="mat_swatch_wrapper">
+                    <span class="solid_color_swatch" style="background-color:hsl(47, 100%, 96%);"></span>
+                  </span>
+                </a>
+                <a href="https://www.levelframes.com/framed-art-visualizer?srsltid=AfmBOoqkIqw9a_YK674lcG8xouHZ3Q2CSJFwEcMq2ThLG9Fd41HVGDDe#"
+                  class="mat_control_swatch mat_color_id_7 bottom_tooltip tooltipstered" data-mat-color="Cream">
+                  <span class="mat_swatch_wrapper">
+                    <span class="solid_color_swatch" style="background-color:hsl(51, 78%, 91%);"></span>
+                  </span>
+                </a>
+                <a href="https://www.levelframes.com/framed-art-visualizer?srsltid=AfmBOoqkIqw9a_YK674lcG8xouHZ3Q2CSJFwEcMq2ThLG9Fd41HVGDDe#"
+                  class="mat_control_swatch mat_color_id_8 bottom_tooltip tooltipstered" data-mat-color="Cool Gray">
+                  <span class="mat_swatch_wrapper">
+                    <span class="solid_color_swatch" style="background-color:hsl(200, 4%, 74%);"></span>
+                  </span>
+                </a>
+                <a href="https://www.levelframes.com/framed-art-visualizer?srsltid=AfmBOoqkIqw9a_YK674lcG8xouHZ3Q2CSJFwEcMq2ThLG9Fd41HVGDDe#"
+                  class="mat_control_swatch mat_color_id_9 bottom_tooltip tooltipstered" data-mat-color="Charcoal">
+                  <span class="mat_swatch_wrapper">
+                    <span class="solid_color_swatch" style="background-color:hsl(0, 0%, 36%);"></span>
+                  </span>
+                </a>
+                <a href="https://www.levelframes.com/framed-art-visualizer?srsltid=AfmBOoqkIqw9a_YK674lcG8xouHZ3Q2CSJFwEcMq2ThLG9Fd41HVGDDe#"
+                  class="mat_control_swatch mat_color_id_20 bottom_tooltip tooltipstered" data-mat-color="8-Ply White">
+                  <span class="mat_swatch_wrapper">
+                    <span class="solid_color_swatch" style="background-color:rgb(255, 255, 255);"></span>
+                  </span>
+                </a>
+                <a href="https://www.levelframes.com/framed-art-visualizer?srsltid=AfmBOoqkIqw9a_YK674lcG8xouHZ3Q2CSJFwEcMq2ThLG9Fd41HVGDDe#"
+                  class="mat_control_swatch mat_color_id_21 bottom_tooltip tooltipstered" data-mat-color="8-Ply Black">
+                  <span class="mat_swatch_wrapper">
+                    <span class="solid_color_swatch" style="background-color:hsl(0, 0%, 13%);"></span>
+                  </span>
+                </a>
+                <a href="https://www.levelframes.com/framed-art-visualizer?srsltid=AfmBOoqkIqw9a_YK674lcG8xouHZ3Q2CSJFwEcMq2ThLG9Fd41HVGDDe#"
+                  class="mat_control_swatch mat_color_id_22 bottom_tooltip tooltipstered"
+                  data-mat-color="8-Ply Antique White">
+                  <span class="mat_swatch_wrapper">
+                    <span class="solid_color_swatch" style="background-color:hsl(47, 100%, 96%);"></span>
+                  </span>
+                </a>
+              </div>
+              <div class="selected_mat_color_display">Selected: White</div>
+
+              <div class="m-top-15"></div>
+              <span class="white_sidebar_section_label">
+                Advanced Mat Widths
+              </span>
+              <div class="m-top-10"></div>
+              <form class="fieldset_styles">
+                <div class="weighted_mat_input_block">
+                  <fieldset>
+                    <legend>Top</legend>
+                    <input type="number" inputmode="decimal" step="0.5" min="0" id="mat_top_width"
+                      class="required_input number_input weighted_mat_input" data-side="matTopWidth">
+                  </fieldset>
+                </div>
+                <div class="weighted_mat_input_block">
+                  <fieldset>
+                    <legend>Bottom</legend>
+                    <input type="number" inputmode="decimal" step="0.5" min="0" id="mat_bottom_width"
+                      class="required_input number_input weighted_mat_input" data-side="matBottomWidth">
+                  </fieldset>
+                </div>
+                <div class="weighted_mat_input_block">
+                  <fieldset>
+                    <legend>Left</legend>
+                    <input type="number" inputmode="decimal" step="0.5" min="0" id="mat_left_width"
+                      class="required_input number_input weighted_mat_input" data-side="matLeftWidth">
+                  </fieldset>
+                </div>
+                <div class="weighted_mat_input_block">
+                  <fieldset>
+                    <legend>Right</legend>
+                    <input type="number" inputmode="decimal" step="0.5" min="0" id="mat_right_width"
+                      class="required_input number_input weighted_mat_input" data-side="matRightWidth">
+                  </fieldset>
+                </div>
+
+                <div class="m-top-15"></div>
+                <div>
+                  <span class="white_sidebar_section_label">
+                    Float Mounting <a
+                      href="https://www.levelframes.com/framed-art-visualizer?srsltid=AfmBOoqkIqw9a_YK674lcG8xouHZ3Q2CSJFwEcMq2ThLG9Fd41HVGDDe#float_popup"
+                      class="open-popup-link regular_tooltip frame_controls_info_bubble tooltipstered"><i
+                        class="fa fa-info-circle"></i></a>
+                  </span>
+                  <div class="m-top-10"></div>
+                  <p class="float_mount_shipping_text" style="font-size:14px; color:#ff0000;">Please allow an extra week
+                    for float-mounted frames.</p>
+                  <div class="p-bottom-10"></div>
+                </div>
+
+                <div class="float_radios">
+                  <label for="no-mounting">
+                    <input type="radio" value="none" name="mounting" id="no-mounting" checked=""> None
+                  </label>
+                  <label for="sandwich-float" class="regular_tooltip tooltipstered">
+                    <input type="radio" value="sandwich" data-default-spacer="0" data-default-spacer-color=""
+                      name="mounting" id="sandwich-float"> Sandwich
+                  </label>
+                  <label for="elevated-float" class="regular_tooltip tooltipstered">
+                    <input type="radio" value="elevated" data-default-spacer="0.25" data-default-spacer-color="white"
+                      name="mounting" id="elevated-float"> Elevated
+                  </label>
+                  <label for="beva-float" class="admin_only_option">
+                    <input type="radio" value="beva" name="mounting" id="beva-float"> Beva
+                  </label>
+                </div>
+              </form>
+
+              <div class="admin_only_option">
+                <div class="m-top-15"></div>
+                <div class="spacers_area">
+                  <div>
+                    <span class="white_sidebar_section_label">
+                      Spacers
+                    </span>
+                  </div>
+
+                  <div class="spacer_radios">
+                    <label for="no-spacers" class="no-spacer-option">
+                      <input type="radio" value="0" name="spacers" id="no-spacers" checked=""> None
+                    </label>
+                    <label for="quarter-spacers">
+                      <input type="radio" value="0.25" name="spacers" id="quarter-spacers"> 1/4"
+                    </label>
+
+                    <label for="half-spacers">
+                      <input type="radio" value="0.50" name="spacers" id="half-spacers"> 1/2"
+                    </label>
+                  </div>
+                </div>
+
+                <div class="m-top-10">
+                </div>
+              </div>
+            </div>
+
+            <div id="mat_colors_popup" class="get_started_popup mfp-with-anim mfp-hide normal_font">
+              <h3>4-Ply Mat Colors</h3>
+              <p class="size_14">Each mat color offers conservation-level art protection throughout its surface, core
+                and backing.</p>
+
+              <div class="m-top-20"></div>
+              <img src="./assets/images/image-043.jpg"
+                alt="mat colors for custom frames online" loading="lazy" style="width:100%; max-width:100%;">
+              <h3>8-Ply Mats</h3>
+              <p class="size_14">The mat opening is cut on an angle, creating a beveled edge around the inside. The
+                thickness of the mat board, or ply, determines the size of that beveled edge. Standard mats are 4-ply,
+                and we offer a thicker, 8-ply mat in select colors for a more refined and elevated look.</p>
+
+              <div class="m-top-20"></div>
+              <img src="./assets/images/image-004.jpg"
+                alt="mat colors for custom frames online" loading="lazy" style="width:100%; max-width:100%;">
+            </div>
+            <div id="float_popup" class="big_get_started_popup mfp-with-anim mfp-hide float_table_popup normal_font">
+              <h2>Float Types</h2>
+
+              <table class="table m-top-10">
+                <tbody>
+                  <tr>
+                    <td class="float_popup_image"><img
+                        src="./assets/images/image-056.jpg"
+                        alt="custom framing online sandwich float mount"></td>
+                    <td>
+                      <span class="float_popup_title">Sandwich Float</span><br>
+                      <div class="float_popup_description">
+                        <p>To reveal the edges of your artwork, you can float it on top of the mat. Change the Float
+                          Margin to adjust the amount of matting shown on each side. The artwork will be pressed between
+                          the glaze and the matting (hence the "sandwich").</p>
+                        <p>If you are framing at home, the matting will arrive with pre-configured, double-sided tape
+                          strips to help you position the art.</p>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="float_popup_image"><img
+                        src="./assets/images/image-026.jpg"
+                        alt="custom framing elevated float mount with spacers"></td>
+                    <td>
+                      <span class="float_popup_title">Elevated Float Mount</span><br>
+                      <div class="float_popup_description">
+                        <p>Spacers inside the frame create a 1/4" air gap between the matting and glaze, and your
+                          artwork floats 1/8" above the mat on an archival foamboard lift. This creates a dramatic
+                          shadow around the edges and creates the illusion that your artwork is literally floating. </p>
+                        <p>When we frame for you in our studio, we'll dry-mount your piece so that it lies perfectly
+                          flat and smooth (this will not damage your artwork, but cannot be reversed). When framing at
+                          home, the pre-installed lift comes with double-sided tape strips to help you position the art
+                          and secure it in place.</p>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+
+            <p></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="m-top-40 generated_screenshots"></div>
+
+    <div class="generating_scene_modal white-popup mfp-with-anim mfp-3d-unfold mfp-hide">
+      <div class="generating_scene_content">
+        <h2>Building Your Scene</h2>
+        <p>Deploying robots to build a scene with your unique frame... Hang tight, this should take about 10 seconds.
+        </p>
+        <div class="spin_loader" style="display:block">Loading...</div>
+      </div>
+
+      <div class="scene_image_area align_center">
+      </div>
+
+      <div class="screenshot_error_area"></div>
+    </div>
+
+    <form class="new_cart" id="new_cart" action="https://www.levelframes.com/carts" accept-charset="UTF-8"
+      method="post"><input name="utf8" type="hidden" value="✓" autocomplete="off"><input type="hidden"
+        name="authenticity_token"
+        value="hxqbC3ptkuU4TbGkE6vcTqAT0dBTub3k4CBTR6JitQ2iExJyPTwR49f3MzhNI1znU_FHk_GRFTcF5iClOjj2UQ"
+        autocomplete="off">
+
+      <input class="cart_artwork_width" autocomplete="off" type="hidden"
+        name="cart[cart_items_attributes][0][artwork_width]" id="cart_cart_items_attributes_0_artwork_width">
+      <input class="cart_artwork_height" autocomplete="off" type="hidden"
+        name="cart[cart_items_attributes][0][artwork_height]" id="cart_cart_items_attributes_0_artwork_height">
+      <input class="cart_outer_frame_width" autocomplete="off" type="hidden"
+        name="cart[cart_items_attributes][0][outer_frame_width]" id="cart_cart_items_attributes_0_outer_frame_width">
+      <input class="cart_outer_frame_height" autocomplete="off" type="hidden"
+        name="cart[cart_items_attributes][0][outer_frame_height]" id="cart_cart_items_attributes_0_outer_frame_height">
+      <input class="cart_frame_width" autocomplete="off" type="hidden"
+        name="cart[cart_items_attributes][0][frame_width]" id="cart_cart_items_attributes_0_frame_width">
+      <input class="cart_frame_width_id" autocomplete="off" type="hidden"
+        name="cart[cart_items_attributes][0][frame_width_id]" id="cart_cart_items_attributes_0_frame_width_id">
+      <input class="cart_profile" autocomplete="off" type="hidden" name="cart[cart_items_attributes][0][profile]"
+        id="cart_cart_items_attributes_0_profile">
+      <input class="cart_frame_color_id" autocomplete="off" type="hidden"
+        name="cart[cart_items_attributes][0][frame_color_id]" id="cart_cart_items_attributes_0_frame_color_id">
+      <input class="cart_matting" autocomplete="off" type="hidden" value="0.0"
+        name="cart[cart_items_attributes][0][matting]" id="cart_cart_items_attributes_0_matting">
+      <input class="cart_mat_id" autocomplete="off" type="hidden" name="cart[cart_items_attributes][0][mat_id]"
+        id="cart_cart_items_attributes_0_mat_id">
+      <input class="cart_mat_top_width" autocomplete="off" type="hidden"
+        name="cart[cart_items_attributes][0][mat_top_width]" id="cart_cart_items_attributes_0_mat_top_width">
+      <input class="cart_mat_bottom_width" autocomplete="off" type="hidden"
+        name="cart[cart_items_attributes][0][mat_bottom_width]" id="cart_cart_items_attributes_0_mat_bottom_width">
+      <input class="cart_mat_right_width" autocomplete="off" type="hidden"
+        name="cart[cart_items_attributes][0][mat_right_width]" id="cart_cart_items_attributes_0_mat_right_width">
+      <input class="cart_mat_left_width" autocomplete="off" type="hidden"
+        name="cart[cart_items_attributes][0][mat_left_width]" id="cart_cart_items_attributes_0_mat_left_width">
+      <input class="cart_glaze" autocomplete="off" type="hidden" name="cart[cart_items_attributes][0][glaze]"
+        id="cart_cart_items_attributes_0_glaze">
+      <input class="cart_glaze_id" autocomplete="off" type="hidden" name="cart[cart_items_attributes][0][glaze_id]"
+        id="cart_cart_items_attributes_0_glaze_id">
+      <input class="cart_mat_color" autocomplete="off" type="hidden" name="cart[cart_items_attributes][0][mat_color]"
+        id="cart_cart_items_attributes_0_mat_color">
+      <input class="cart_mat_color_id" autocomplete="off" type="hidden"
+        name="cart[cart_items_attributes][0][mat_color_id]" id="cart_cart_items_attributes_0_mat_color_id">
+      <input class="cart_paper_type" autocomplete="off" type="hidden" name="cart[cart_items_attributes][0][paper_type]"
+        id="cart_cart_items_attributes_0_paper_type">
+      <input class="cart_paper_type_id" autocomplete="off" type="hidden"
+        name="cart[cart_items_attributes][0][paper_type_id]" id="cart_cart_items_attributes_0_paper_type_id">
+      <input class="cart_total_price" autocomplete="off" type="hidden"
+        name="cart[cart_items_attributes][0][total_price]" id="cart_cart_items_attributes_0_total_price">
+      <input class="cart_thumb_url" autocomplete="off" type="hidden" name="cart[cart_items_attributes][0][thumb_url]"
+        id="cart_cart_items_attributes_0_thumb_url">
+      <input class="cart_product_type_id" autocomplete="off" type="hidden"
+        name="cart[cart_items_attributes][0][product_type_id]" id="cart_cart_items_attributes_0_product_type_id">
+      <input class="cart_level_token" autocomplete="off" type="hidden"
+        name="cart[cart_items_attributes][0][level_token]" id="cart_cart_items_attributes_0_level_token">
+      <input class="cart_float" autocomplete="off" type="hidden" name="cart[cart_items_attributes][0][float]"
+        id="cart_cart_items_attributes_0_float">
+      <input class="cart_spacers" autocomplete="off" type="hidden" value="0.0"
+        name="cart[cart_items_attributes][0][spacers]" id="cart_cart_items_attributes_0_spacers">
+      <input class="cart_spacer_color" autocomplete="off" type="hidden"
+        name="cart[cart_items_attributes][0][spacer_color]" id="cart_cart_items_attributes_0_spacer_color">
+      <input class="cart_framing_process" autocomplete="off" type="hidden" value="diy"
+        name="cart[cart_items_attributes][0][framing_process]" id="cart_cart_items_attributes_0_framing_process">
+      <input class="cart_mat_window_width" autocomplete="off" type="hidden"
+        name="cart[cart_items_attributes][0][mat_window_width]" id="cart_cart_items_attributes_0_mat_window_width">
+      <input class="cart_mat_window_height" autocomplete="off" type="hidden"
+        name="cart[cart_items_attributes][0][mat_window_height]" id="cart_cart_items_attributes_0_mat_window_height">
+      <input class="cart_inner_width" autocomplete="off" type="hidden"
+        name="cart[cart_items_attributes][0][inner_width]" id="cart_cart_items_attributes_0_inner_width">
+      <input class="cart_inner_height" autocomplete="off" type="hidden"
+        name="cart[cart_items_attributes][0][inner_height]" id="cart_cart_items_attributes_0_inner_height">
+      <input class="cart_thumb_token" autocomplete="off" type="hidden"
+        name="cart[cart_items_attributes][0][thumb_token]" id="cart_cart_items_attributes_0_thumb_token">
+      <input class="cart_product_name" autocomplete="off" type="hidden"
+        name="cart[cart_items_attributes][0][product_name]" id="cart_cart_items_attributes_0_product_name">
+      <input class="cart_product_id" autocomplete="off" type="hidden" name="cart[cart_items_attributes][0][product_id]"
+        id="cart_cart_items_attributes_0_product_id">
+      <input class="cart_substrate_id" autocomplete="off" type="hidden"
+        name="cart[cart_items_attributes][0][substrate_id]" id="cart_cart_items_attributes_0_substrate_id">
+      <input class="cart_hanging_hardware" autocomplete="off" type="hidden"
+        name="cart[cart_items_attributes][0][hanging_hardware]" id="cart_cart_items_attributes_0_hanging_hardware">
+      <input class="cart_bundle_id" autocomplete="off" type="hidden" name="cart[cart_items_attributes][0][bundle_id]"
+        id="cart_cart_items_attributes_0_bundle_id">
+
+      <input class="cart_custom_field_name" autocomplete="off" type="hidden"
+        name="cart[cart_items_attributes][0][custom_field_name]" id="cart_cart_items_attributes_0_custom_field_name">
+      <input class="cart_custom_field_value" autocomplete="off" type="hidden"
+        name="cart[cart_items_attributes][0][custom_field_value]" id="cart_cart_items_attributes_0_custom_field_value">
+
+      <input value="none" autocomplete="off" type="hidden" name="cart[referer]" id="cart_referer">
+
+
+
+      <input name="recaptcha_token" type="hidden" id="recaptcha_token">
+
+    </form>
+
+    <script>
+      $(document).ready(function () {
+        window.isAdmin = false;
+
+        var frameArgs = { "artworkWidth": 16, "artworkHeight": 24, "frameColorId": 9, "frameWidthId": 5, "matWidth": 0, "matTopWidth": 2, "matBottomWidth": 2, "matRightWidth": 2, "matLeftWidth": 2, "matColorId": 1, "glazeId": 1, "paperTypeId": 1, "substrateId": null, "framingProcess": "diy", "float": "none", "spacers": "0", "productTypeId": 1, "thumbUrl": null, "thumbToken": null, "levelToken": null, "bundleId": null, "artLayers": null, "productName": null, "courier": null };
+
+        /* Editor specific args */
+        frameArgs.productTypeId = 2;
+        frameArgs.hasPrintableMedia = 1;
+        frameArgs.profiles = [6, 2, 3, 5, 7, 8, 9, 10, 12, 11, 68, 67, 61, 60, 66, 65, 53, 54, 77, 78];
+        frameArgs.matWidths = [0.0, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0];
+        frameArgs.disableHoverRotation = true;
+        frameArgs.apiKey = '0lwYzGmAn_xBDD1mDJxAjg';
+        frameArgs.publicApi = 'true';
+        frameArgs.sceneName = 'white';
+
+        /* End editor specific args */
+
+        window.levelFrame_1_1 = new VisualizerFrameEditor(frameArgs);
+        window.levelFrame_1_1.renderFrame();
+
+        const $artworkWidth = $('#visualizer-artwork-width');
+        const $artworkHeight = $('#visualizer-artwork-height');
+        const $artworkSize = $('#visualizer-artwork-size');
+
+        // Keep original width/height selects for compatibility and sync via one dropdown.
+        const presetSizes = [
+          [12, 8],
+          [18, 12],
+          [12, 24],
+          [6, 4],
+          [24, 36],
+          [20, 30]
+        ];
+        const currentWidth = Number($artworkWidth.val());
+        const currentHeight = Number($artworkHeight.val());
+        const hasCurrentPreset = presetSizes.some(function (sizePair) {
+          return sizePair[0] === currentWidth && sizePair[1] === currentHeight;
+        });
+        const selectedPreset = hasCurrentPreset ? [currentWidth, currentHeight] : presetSizes[0];
+
+        let sizeOptions = '';
+        presetSizes.forEach(function (sizePair) {
+          const widthValue = sizePair[0];
+          const heightValue = sizePair[1];
+          const combinedValue = `${widthValue}x${heightValue}`;
+          const isSelected = widthValue === selectedPreset[0] && heightValue === selectedPreset[1];
+          sizeOptions += `<option value="${combinedValue}" ${isSelected ? 'selected' : ''}>${widthValue}" x ${heightValue}"</option>`;
+        });
+        $artworkSize.html(sizeOptions);
+        $artworkWidth.val(String(selectedPreset[0])).trigger('change');
+        $artworkHeight.val(String(selectedPreset[1])).trigger('change');
+
+        $artworkSize.on('change', function () {
+          const selectedValue = String($(this).val() || '');
+          const [widthValue, heightValue] = selectedValue.split('x');
+          if (!widthValue || !heightValue) return;
+          $artworkWidth.val(widthValue).trigger('change');
+          $artworkHeight.val(heightValue).trigger('change');
+        });
+
+        //allows for smooth transitions when cycling through the frame profiles.
+        $("<img />").attr("src", "https://d29mtkonxnc5fw.cloudfront.net/site_assets/black-frame-face17.jpg");
+        $("<img />").attr("src", "https://d29mtkonxnc5fw.cloudfront.net/site_assets/black-vector-side9.jpg");
+        $("<img />").attr("src", "https://d29mtkonxnc5fw.cloudfront.net/site_assets/white-frame-vector2.jpg");
+        $("<img />").attr("src", "https://d29mtkonxnc5fw.cloudfront.net/site_assets/white-vector-side.jpg");
+        $("<img />").attr("src", "https://d29mtkonxnc5fw.cloudfront.net/site_assets/natural-frame-face.jpg");
+        $("<img />").attr("src", "https://d29mtkonxnc5fw.cloudfront.net/site_assets/natural-maple-side2.jpg");
+        $("<img />").attr("src", "https://d29mtkonxnc5fw.cloudfront.net/site_assets/natural-walnut-render-face2.jpg");
+        $("<img />").attr("src", "https://d29mtkonxnc5fw.cloudfront.net/site_assets/natural-walnut-side-render2.jpg");
+        $("<img />").attr("src", "https://d29mtkonxnc5fw.cloudfront.net/site_assets/lancaster-dark-face.jpg");
+        $("<img />").attr("src", "https://d29mtkonxnc5fw.cloudfront.net/site_assets/lancaster-dark-side2.jpg");
+        $("<img />").attr("src", "https://d29mtkonxnc5fw.cloudfront.net/site_assets/weathered-grey-face.jpg");
+        $("<img />").attr("src", "https://d29mtkonxnc5fw.cloudfront.net/site_assets/weathered-grey-improved2.jpg");
+        $("<img />").attr("src", "https://d29mtkonxnc5fw.cloudfront.net/site_assets/weathered-natural-face-2.jpg");
+        $("<img />").attr("src", "https://d29mtkonxnc5fw.cloudfront.net/site_assets/weathered-natural-side-large4.jpg");
+        $("<img />").attr("src", "https://d29mtkonxnc5fw.cloudfront.net/site_assets/academie-face.jpg");
+        $("<img />").attr("src", "https://d29mtkonxnc5fw.cloudfront.net/site_assets/matte-black-side3.jpg");
+        $("<img />").attr("src", "https://d29mtkonxnc5fw.cloudfront.net/site_assets/academie-gold.jpg");
+        $("<img />").attr("src", "https://d29mtkonxnc5fw.cloudfront.net/site_assets/academie-gold-side-xlarge.jpg");
+        $("<img />").attr("src", "https://d29mtkonxnc5fw.cloudfront.net/site_assets/academie-yellow.jpg");
+        $("<img />").attr("src", "https://d29mtkonxnc5fw.cloudfront.net/site_assets/academie-silver-side-large3.jpg");
+        $("<img />").attr("src", "https://d29mtkonxnc5fw.cloudfront.net/site_assets/kota-pecan-face3.jpg");
+        $("<img />").attr("src", "https://d29mtkonxnc5fw.cloudfront.net/site_assets/kota-pecan-side2.jpg");
+        $("<img />").attr("src", "https://d29mtkonxnc5fw.cloudfront.net/site_assets/kota-cherry-face4.jpg");
+        $("<img />").attr("src", "https://d29mtkonxnc5fw.cloudfront.net/site_assets/kota-cherry-side.jpg");
+        $("<img />").attr("src", "https://d29mtkonxnc5fw.cloudfront.net/site_assets/kota-walnut-render-face3.jpg");
+        $("<img />").attr("src", "https://d29mtkonxnc5fw.cloudfront.net/site_assets/kota-walnut-side-render.jpg");
+        $("<img />").attr("src", "https://d29mtkonxnc5fw.cloudfront.net/site_assets/kota-face4.jpg");
+        $("<img />").attr("src", "https://d29mtkonxnc5fw.cloudfront.net/site_assets/kota-side14.jpg");
+        $("<img />").attr("src", "https://d29mtkonxnc5fw.cloudfront.net/site_assets/sahara-gold-face.jpg");
+        $("<img />").attr("src", "https://d29mtkonxnc5fw.cloudfront.net/site_assets/sahara-side4.jpg");
+        $("<img />").attr("src", "https://d29mtkonxnc5fw.cloudfront.net/site_assets/arctic-silver-face4.jpg");
+        $("<img />").attr("src", "https://d29mtkonxnc5fw.cloudfront.net/site_assets/arctic-silver-side3.jpg");
+        $("<img />").attr("src", "https://d29mtkonxnc5fw.cloudfront.net/site_assets/gold-alloy-face2.jpg");
+        $("<img />").attr("src", "https://d29mtkonxnc5fw.cloudfront.net/site_assets/gold-alloy-side3.jpg");
+        $("<img />").attr("src", "https://d29mtkonxnc5fw.cloudfront.net/site_assets/nickel-nice-face2.jpg");
+        $("<img />").attr("src", "https://d29mtkonxnc5fw.cloudfront.net/site_assets/gold-alloy-side3.jpg");
+        $("<img />").attr("src", "https://d29mtkonxnc5fw.cloudfront.net/site_assets/burlwood-blonde-face.webp");
+        $("<img />").attr("src", "https://d29mtkonxnc5fw.cloudfront.net/site_assets/burlwood-blond-side.jpg");
+        $("<img />").attr("src", "https://d29mtkonxnc5fw.cloudfront.net/site_assets/burlwood-face3.webp");
+        $("<img />").attr("src", "https://d29mtkonxnc5fw.cloudfront.net/site_assets/burlwood-brunette-side.jpg");
+      });
+    </script>
+
+
+
+  </div>
+
+  <script>
+    $(() => {
+      // Use global variable expected by legacy handlers in bundled app.js.
+      uppyImageUpload = window.uppyImageUpload || null;
+      let uppyLoadAttempts = 0;
+      const maxUppyLoadAttempts = 100; // 5 seconds (50ms * 100)
+
+      const initializeUppyUpload = () => {
+        if (window.uppy) {
+          uppyImageUpload = window.uppyImageUpload = new UppyUpload();
+          // Keep global variable in sync for legacy handlers inside app.js bundle.
+          window.uppyImageUpload = uppyImageUpload;
+          setupUppyClickHandlers();
+        } else {
+          uppyLoadAttempts++;
+          if (uppyLoadAttempts >= maxUppyLoadAttempts) {
+            console.error('Uppy failed to load after 5 seconds. Upload functionality will be disabled.');
+            // Log this critical error
+            if (window.uppyImageUpload && window.uppyImageUpload.logClientError) {
+              window.uppyImageUpload.logClientError('initialization', 'initialization', {
+                error: 'Uppy failed to load after 5 seconds',
+                attempts: uppyLoadAttempts
+              });
+            }
+            return;
+          }
+          // Try again in 50ms
+          setTimeout(initializeUppyUpload, 50);
+        }
+      };
+
+      const setupUppyClickHandlers = () => {
+        $('body').on('click', '.new_level_photo', function (e) {
+          e.preventDefault();
+
+          // Ensure default fast-upload settings before normal upload flows
+          uppyImageUpload.resetPickerOptionsToDefaults();
+
+          let fineArtPrint = $(this).data('fine-art-print');
+          let url;
+
+          if (fineArtPrint == true) {
+            uppyImageUpload.upload(function () {
+              url = `/images/${uppyImageUpload.imgToken}/edit?print=1`;
+              window.location = url;
+            });
+          } else {
+            uppyImageUpload.upload(function () {
+              url = `/frames/photos?thumb_token=${uppyImageUpload.thumbToken}`;
+              window.location = url;
+            });
+          }
+
+          levelApp.utils.hideIntercom();
+        });
+
+        $('body').on('click', '.new_level_photo_editable', function (e) {
+          e.preventDefault();
+
+          let fineArtPrint = $(this).data('fine-art-print');
+          let url;
+
+          uppyImageUpload.setNewPickerOptions({
+            enableImageEditor: true,
+            autoProceed: false,
+            autoOpenEditor: false,
+            // cropAspectRatio: 0.25,
+          });
+
+          if (fineArtPrint == true) {
+            uppyImageUpload.upload(function () {
+              url = `/images/${uppyImageUpload.imgToken}/edit?print=1`;
+              window.location = url;
+            });
+          } else {
+            uppyImageUpload.upload(function () {
+              url = `/frames/photos?thumb_token=${uppyImageUpload.thumbToken}`;
+              window.location = url;
+            });
+          }
+
+          levelApp.utils.hideIntercom();
+        });
+
+        $('body').on('click', '.new_canvas_print_upload', function (e) {
+          e.preventDefault();
+
+          // Ensure default fast-upload settings before normal upload flows
+          uppyImageUpload.resetPickerOptionsToDefaults();
+
+          uppyImageUpload.upload(function () {
+            window.location = `/frames/canvas?thumb_token=${uppyImageUpload.thumbToken}`;
+          });
+
+          levelApp.utils.hideIntercom();
+        });
+      };
+
+      // Start trying to initialize Uppy
+      initializeUppyUpload();
+    });
+  </script>
+
+</body>
+
+</html>

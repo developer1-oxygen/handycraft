@@ -1,0 +1,38 @@
+// ------------------------------------------
+// XTS UPLOAD
+// ------------------------------------------
+
+.xts-upload-preview {
+
+	img {
+		display: inline-block;
+		margin-bottom: $xts-option-space;
+		padding: 5px;
+		max-width: 160px;
+		border: 1px solid $xts-option-border-color;
+		border-radius: $xts-option-border-radius;
+	}
+}
+
+.xts-upload-btns {
+	display: flex;
+	margin-top: 0 !important;
+
+	button {
+
+		&:first-child {
+			margin-right: $xts-option-space / 2;
+		}
+	}
+
+	.rtl & {
+
+		button {
+
+			&:first-child {
+				margin-right: 0;
+				margin-left: $xts-option-space / 2;
+			}
+		}
+	}
+}
