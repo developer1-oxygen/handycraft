@@ -4787,6 +4787,47 @@ function wd_override_topbar_contact_content() {
 add_action( 'wp_footer', 'wd_override_topbar_contact_content', 1001 );
 
 /**
+ * Home page: show the same theme footer as shop (widgets + copyrights).
+ * Home page metabox can disable footer; testimonials also have <footer> tags that
+ * must not be targeted by footer override JS.
+ *
+ * @param mixed  $value     Metadata value.
+ * @param int    $object_id Post ID.
+ * @param string $meta_key  Meta key.
+ * @param bool   $single    Single value flag.
+ * @return mixed
+ */
+function wd_home_enable_theme_footer_meta( $value, $object_id, $meta_key, $single ) {
+	if ( is_admin() || ( ! is_front_page() && ! is_home() ) ) {
+		return $value;
+	}
+
+	if ( ! in_array( $meta_key, array( '_woodmart_footer_off', '_woodmart_copyrights_off', '_woodmart_prefooter_off' ), true ) ) {
+		return $value;
+	}
+
+	$front_id = (int) get_option( 'page_on_front' );
+	if ( ! $front_id || (int) $object_id !== $front_id ) {
+		return $value;
+	}
+
+	return $single ? '' : array( '' );
+}
+add_filter( 'get_post_metadata', 'wd_home_enable_theme_footer_meta', 20, 4 );
+
+add_filter(
+	'woodmart_global_options',
+	function ( $options ) {
+		if ( ! is_admin() && ( is_front_page() || is_home() ) && is_array( $options ) ) {
+			$options['disable_footer']     = true;
+			$options['disable_copyrights'] = true;
+		}
+		return $options;
+	},
+	10001
+);
+
+/**
  * Footer content overrides:
  * - Update phone number.
  * - Remove fax line.
@@ -4805,7 +4846,8 @@ function wd_override_footer_content() {
 			}
 
 			function applyFooterOverrides() {
-				var footer = document.querySelector('footer.footer-container, footer, .main-footer');
+				// Only theme site footer — not testimonial <footer> elements inside page content.
+				var footer = document.querySelector('footer.footer-container') || document.querySelector('.footer-container');
 				if (!footer) return;
 
 				// 1) Update footer phone and remove fax line.
