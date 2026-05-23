@@ -1583,6 +1583,434 @@ add_action( 'wp_ajax_wd_upload_frame_artwork', 'wd_upload_frame_artwork_ajax' );
 add_action( 'wp_ajax_nopriv_wd_upload_frame_artwork', 'wd_upload_frame_artwork_ajax' );
 
 /**
+ * True when the classic WooCommerce product data form is being saved.
+ *
+ * @return bool
+ */
+function wd_is_woocommerce_product_admin_save() {
+	if ( empty( $_POST['woocommerce_meta_nonce'] ) ) {
+		return false;
+	}
+
+	return (bool) wp_verify_nonce(
+		sanitize_text_field( wp_unslash( $_POST['woocommerce_meta_nonce'] ) ),
+		'woocommerce_save_data'
+	);
+}
+
+/**
+ * Persist WAU "Enable File Uploads" on the product object before WC saves it.
+ *
+ * The plugin only hooks woocommerce_process_product_meta (priority 10), which can
+ * run in the wrong order or be skipped; saving here keeps the checkbox reliable.
+ *
+ * @param WC_Product $product Product object.
+ * @return void
+ */
+function wd_save_wau_product_enable_on_product_object( $product ) {
+	if ( ! $product instanceof WC_Product || ! wd_is_woocommerce_product_admin_save() ) {
+		return;
+	}
+
+	$enabled = isset( $_POST['_wau_product_enable'] ) ? 'yes' : 'no';
+	$product->update_meta_data( '_wau_product_enable', $enabled );
+
+	if ( isset( $_POST['_wau_min_files'] ) ) {
+		$product->update_meta_data( '_wau_min_files', absint( wp_unslash( $_POST['_wau_min_files'] ) ) );
+	}
+	if ( isset( $_POST['_wau_max_files'] ) ) {
+		$product->update_meta_data( '_wau_max_files', absint( wp_unslash( $_POST['_wau_max_files'] ) ) );
+	}
+	if ( isset( $_POST['_wau_product_charge'] ) ) {
+		$product->update_meta_data( '_wau_product_charge', 'yes' );
+	} else {
+		$product->update_meta_data( '_wau_product_charge', 'no' );
+	}
+}
+add_action( 'woocommerce_admin_process_product_object', 'wd_save_wau_product_enable_on_product_object', 99, 1 );
+
+/**
+ * Backup save for WAU product meta (runs after core product data save).
+ *
+ * @param int $post_id Product post ID.
+ * @return void
+ */
+function wd_save_wau_product_enable_meta_backup( $post_id ) {
+	if ( ! wd_is_woocommerce_product_admin_save() ) {
+		return;
+	}
+
+	$post_id = absint( $post_id );
+	if ( $post_id <= 0 ) {
+		return;
+	}
+
+	$enabled = isset( $_POST['_wau_product_enable'] ) ? 'yes' : 'no';
+	update_post_meta( $post_id, '_wau_product_enable', $enabled );
+
+	if ( isset( $_POST['_wau_min_files'] ) ) {
+		update_post_meta( $post_id, '_wau_min_files', absint( wp_unslash( $_POST['_wau_min_files'] ) ) );
+	}
+	if ( isset( $_POST['_wau_max_files'] ) ) {
+		update_post_meta( $post_id, '_wau_max_files', absint( wp_unslash( $_POST['_wau_max_files'] ) ) );
+	}
+
+	update_post_meta(
+		$post_id,
+		'_wau_product_charge',
+		isset( $_POST['_wau_product_charge'] ) ? 'yes' : 'no'
+	);
+}
+add_action( 'woocommerce_process_product_meta', 'wd_save_wau_product_enable_meta_backup', 99, 1 );
+
+/**
+ * Whether the current request includes a WAU plugin file upload.
+ *
+ * @return bool
+ */
+function wd_request_has_wau_file_upload() {
+	if ( empty( $_FILES['wau_file_addon'] ) ) {
+		return false;
+	}
+
+	$files = $_FILES['wau_file_addon'];
+
+	if ( isset( $files['name'] ) && is_array( $files['name'] ) ) {
+		foreach ( $files['name'] as $name ) {
+			if ( '' !== (string) $name ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	return ! empty( $files['name'] );
+}
+
+/**
+ * Remove WAU "file required" error notices after we bypass validation.
+ *
+ * @return void
+ */
+function wd_clear_wau_file_required_notices() {
+	$notices = wc_get_notices( 'error' );
+	if ( empty( $notices ) ) {
+		return;
+	}
+
+	$keep = array();
+	foreach ( $notices as $notice ) {
+		$text = isset( $notice['notice'] ) ? (string) $notice['notice'] : '';
+		if ( false !== strpos( $text, 'Please select a file to continue' ) ) {
+			continue;
+		}
+		$keep[] = $notice;
+	}
+
+	wc_clear_notices( 'error' );
+	foreach ( $keep as $notice ) {
+		wc_add_notice( $notice['notice'], 'error' );
+	}
+}
+
+/**
+ * WooCommerce Addon Uploads Pro blocks add-to-cart when _wau_product_enable is on
+ * and "mandatory upload" is enabled, but Woodmart AJAX uses form.serialize() and
+ * never sends files. Frame products use wd_upload_frame_artwork instead of WAU.
+ *
+ * @param bool $passed     Validation result.
+ * @param int  $product_id Product ID.
+ * @return bool
+ */
+function wd_bypass_wau_mandatory_for_standard_products( $passed, $product_id ) {
+	if ( $passed ) {
+		return $passed;
+	}
+
+	if ( 'yes' !== get_post_meta( $product_id, '_wau_product_enable', true ) ) {
+		return $passed;
+	}
+
+	// Frame flow uses the visualizer upload, not WAU file fields.
+	if ( function_exists( 'wd_is_frame_product' ) && wd_is_frame_product( $product_id ) ) {
+		wd_clear_wau_file_required_notices();
+		return true;
+	}
+
+	// No files in request (Woodmart serialize / empty upload): allow add to cart without WAU file.
+	// When files are sent via FormData, do not bypass — plugin should attach them to the cart item.
+	if ( ! wd_request_has_wau_file_upload() ) {
+		wd_clear_wau_file_required_notices();
+		return true;
+	}
+
+	return $passed;
+}
+add_filter( 'woocommerce_add_to_cart_validation', 'wd_bypass_wau_mandatory_for_standard_products', 20, 2 );
+
+/**
+ * Ensure product add-to-cart form accepts file uploads (WAU plugin).
+ *
+ * @return void
+ */
+function wd_enqueue_wau_multipart_add_to_cart_script() {
+	if ( ! function_exists( 'is_product' ) || ! is_product() ) {
+		return;
+	}
+
+	$product_id = get_queried_object_id();
+	if ( $product_id <= 0 || 'yes' !== get_post_meta( $product_id, '_wau_product_enable', true ) ) {
+		return;
+	}
+
+	$script_path = get_theme_file_path( 'custom/js/wd-wau-add-to-cart.js' );
+	$script_url  = get_theme_file_uri( 'custom/js/wd-wau-add-to-cart.js' );
+	$version     = file_exists( $script_path ) ? (string) filemtime( $script_path ) : '1.0.0';
+
+	wp_enqueue_script(
+		'wd-wau-add-to-cart',
+		$script_url,
+		array( 'jquery' ),
+		$version,
+		true
+	);
+}
+add_action( 'wp_enqueue_scripts', 'wd_enqueue_wau_multipart_add_to_cart_script', 10050 );
+
+/**
+ * Collect WAU "Uploaded Media" URLs for an order line item.
+ *
+ * @param int $item_id Order item ID.
+ * @return string[]
+ */
+function wd_get_wau_upload_urls_for_order_item( $item_id ) {
+	$item_id = absint( $item_id );
+	if ( $item_id <= 0 || ! function_exists( 'wc_get_order_item_meta' ) ) {
+		return array();
+	}
+
+	$urls = wc_get_order_item_meta( $item_id, 'Uploaded Media', false );
+	if ( ! is_array( $urls ) ) {
+		$urls = $urls ? array( $urls ) : array();
+	}
+
+	$clean = array();
+	foreach ( $urls as $url ) {
+		$url = esc_url_raw( (string) $url );
+		if ( $url ) {
+			$clean[] = $url;
+		}
+	}
+
+	return array_values( array_unique( $clean ) );
+}
+
+/**
+ * Resolve a media URL to a readable local filesystem path when possible.
+ *
+ * @param string $url Media URL.
+ * @return string|false
+ */
+function wd_wau_url_to_local_path( $url ) {
+	$url = esc_url_raw( $url );
+	if ( ! $url ) {
+		return false;
+	}
+
+	$attachment_id = attachment_url_to_postid( $url );
+	if ( $attachment_id ) {
+		$path = get_attached_file( $attachment_id );
+		if ( $path && file_exists( $path ) ) {
+			return $path;
+		}
+	}
+
+	$upload_dir = wp_upload_dir();
+	if ( ! empty( $upload_dir['baseurl'] ) && ! empty( $upload_dir['basedir'] ) ) {
+		$base_url  = set_url_scheme( $upload_dir['baseurl'] );
+		$base_path = $upload_dir['basedir'];
+		$check_url = set_url_scheme( $url );
+
+		if ( 0 === strpos( $check_url, $base_url ) ) {
+			$relative = ltrim( substr( $check_url, strlen( $base_url ) ), '/' );
+			$path     = wp_normalize_path( $base_path . '/' . $relative );
+			if ( file_exists( $path ) ) {
+				return $path;
+			}
+		}
+	}
+
+	return false;
+}
+
+/**
+ * Download all WAU uploads for one order line item as a ZIP (admin).
+ *
+ * @return void
+ */
+function wd_wau_download_item_uploads_zip_handler() {
+	$item_id  = isset( $_GET['item_id'] ) ? absint( $_GET['item_id'] ) : 0;
+	$order_id = isset( $_GET['order_id'] ) ? absint( $_GET['order_id'] ) : 0;
+	$nonce    = isset( $_GET['nonce'] ) ? sanitize_text_field( wp_unslash( $_GET['nonce'] ) ) : '';
+
+	if ( $item_id <= 0 || $order_id <= 0 || ! wp_verify_nonce( $nonce, 'wd_wau_zip_' . $item_id ) ) {
+		wp_die( esc_html__( 'Invalid download request.', 'woodmart' ), 403 );
+	}
+
+	if ( ! current_user_can( 'edit_shop_orders' ) && ! current_user_can( 'manage_woocommerce' ) ) {
+		wp_die( esc_html__( 'You do not have permission to download these files.', 'woodmart' ), 403 );
+	}
+
+	if ( ! class_exists( 'ZipArchive' ) ) {
+		wp_die( esc_html__( 'ZIP support is not available on this server (ZipArchive missing).', 'woodmart' ), 500 );
+	}
+
+	$item = WC_Order_Factory::get_order_item( $item_id );
+	if ( ! $item || 'line_item' !== $item->get_type() || (int) $item->get_order_id() !== $order_id ) {
+		wp_die( esc_html__( 'Order item not found.', 'woodmart' ), 404 );
+	}
+
+	$urls = wd_get_wau_upload_urls_for_order_item( $item_id );
+	if ( empty( $urls ) ) {
+		wp_die( esc_html__( 'No uploaded files found for this item.', 'woodmart' ), 404 );
+	}
+
+	$zip      = new ZipArchive();
+	$tmp_file = wp_tempnam( 'wd-wau-uploads-' . $item_id );
+	if ( ! $tmp_file ) {
+		wp_die( esc_html__( 'Could not create temporary file.', 'woodmart' ), 500 );
+	}
+
+	$opened = $zip->open( $tmp_file, ZipArchive::CREATE | ZipArchive::OVERWRITE );
+	if ( true !== $opened ) {
+		@unlink( $tmp_file );
+		wp_die( esc_html__( 'Could not create ZIP archive.', 'woodmart' ), 500 );
+	}
+
+	$added = 0;
+	$index = 1;
+
+	foreach ( $urls as $url ) {
+		$local_path = wd_wau_url_to_local_path( $url );
+		$ext        = '';
+
+		if ( $local_path ) {
+			$ext = pathinfo( $local_path, PATHINFO_EXTENSION );
+		} else {
+			$parsed = wp_parse_url( $url );
+			if ( ! empty( $parsed['path'] ) ) {
+				$ext = pathinfo( $parsed['path'], PATHINFO_EXTENSION );
+			}
+		}
+
+		$entry_name = sprintf( 'upload-%02d', $index );
+		if ( $ext ) {
+			$entry_name .= '.' . strtolower( preg_replace( '/[^a-z0-9]/i', '', $ext ) );
+		}
+
+		if ( $local_path && file_exists( $local_path ) && is_readable( $local_path ) ) {
+			$zip->addFile( $local_path, $entry_name );
+			++$added;
+		} else {
+			$response = wp_remote_get(
+				$url,
+				array(
+					'timeout'   => 30,
+					'sslverify' => apply_filters( 'https_local_ssl_verify', false ),
+				)
+			);
+
+			if ( ! is_wp_error( $response ) && 200 === (int) wp_remote_retrieve_response_code( $response ) ) {
+				$body = wp_remote_retrieve_body( $response );
+				if ( '' !== $body ) {
+					$zip->addFromString( $entry_name, $body );
+					++$added;
+				}
+			}
+		}
+
+		++$index;
+	}
+
+	$zip->close();
+
+	if ( $added < 1 ) {
+		@unlink( $tmp_file );
+		wp_die( esc_html__( 'Could not add any files to the ZIP.', 'woodmart' ), 500 );
+	}
+
+	$filename = sprintf( 'order-%d-item-%d-uploads.zip', $order_id, $item_id );
+
+	nocache_headers();
+	header( 'Content-Type: application/zip' );
+	header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
+	header( 'Content-Length: ' . filesize( $tmp_file ) );
+
+	// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_readfile
+	readfile( $tmp_file );
+	@unlink( $tmp_file );
+	exit;
+}
+add_action( 'wp_ajax_wd_wau_download_item_uploads_zip', 'wd_wau_download_item_uploads_zip_handler' );
+
+/**
+ * "Download all" button after WAU upload links in order admin.
+ *
+ * @param int                 $item_id Order item ID.
+ * @param WC_Order_Item|false $item    Order item object.
+ * @return void
+ */
+function wd_render_wau_download_all_zip_button( $item_id, $item ) {
+	static $rendered = array();
+
+	$item_id = absint( $item_id );
+	if ( $item_id <= 0 || isset( $rendered[ $item_id ] ) ) {
+		return;
+	}
+
+	if ( ! $item || ! is_a( $item, 'WC_Order_Item' ) || 'line_item' !== $item->get_type() ) {
+		return;
+	}
+
+	$urls = wd_get_wau_upload_urls_for_order_item( $item_id );
+	if ( empty( $urls ) ) {
+		return;
+	}
+
+	$order_id = (int) $item->get_order_id();
+	if ( $order_id <= 0 ) {
+		return;
+	}
+
+	$rendered[ $item_id ] = true;
+
+	$download_url = add_query_arg(
+		array(
+			'action'   => 'wd_wau_download_item_uploads_zip',
+			'item_id'  => $item_id,
+			'order_id' => $order_id,
+			'nonce'    => wp_create_nonce( 'wd_wau_zip_' . $item_id ),
+		),
+		admin_url( 'admin-ajax.php' )
+	);
+
+	$count = count( $urls );
+
+	echo '<div class="wd-wau-download-all-wrap" style="margin-top:10px;clear:both;">';
+	echo '<a href="' . esc_url( $download_url ) . '" class="button button-primary wd-wau-download-all-zip" target="_blank" rel="noopener noreferrer">';
+	echo esc_html(
+		sprintf(
+			/* translators: %d: number of uploaded files */
+			_n( 'Download all (%d file)', 'Download all (%d files)', $count, 'woodmart' ),
+			$count
+		)
+	);
+	echo '</a>';
+	echo '</div>';
+}
+add_action( 'woocommerce_after_order_itemmeta', 'wd_render_wau_download_all_zip_button', 99, 2 );
+
+/**
  * Register Subscriber post type (stores email in post_title)
  */
 function wd_register_subscriber_post_type() {
@@ -3880,15 +4308,17 @@ function wd_fix_order_pay_overlay_issue() {
 	if ( ! function_exists( 'is_checkout_pay_page' ) || ! is_checkout_pay_page() ) {
 		return;
 	}
+
+	// Disabled on order-pay: this script/CSS breaks Razorpay checkout modal (black box / browser not supported).
+	return;
+
 	?>
 	<style id="wd-fix-order-pay-overlay">
 		body.woocommerce-order-pay .blockOverlay,
 		body.woocommerce-order-pay .woocommerce .blockOverlay,
 		body.woocommerce-order-pay form.checkout.processing > .blockOverlay,
 		body.woocommerce-order-pay .blockUI,
-		body.woocommerce-order-pay .woocommerce .blockUI,
-		body.woocommerce-order-pay .razorpay-container + div[style*="position: fixed"],
-		body.woocommerce-order-pay div[style*="position: fixed"][style*="z-index"] {
+		body.woocommerce-order-pay .woocommerce .blockUI {
 			display: none !important;
 			opacity: 0 !important;
 			visibility: hidden !important;
@@ -3903,7 +4333,10 @@ function wd_fix_order_pay_overlay_issue() {
 			function isLikelyOverlay(el) {
 				if (!el || !el.style) return false;
 				var cls = (el.className || '').toString();
-				if (cls.indexOf('blockOverlay') !== -1 || cls.indexOf('blockUI') !== -1 || cls.indexOf('razorpay') !== -1) {
+				if (cls.indexOf('razorpay') !== -1) {
+					return false;
+				}
+				if (cls.indexOf('blockOverlay') !== -1 || cls.indexOf('blockUI') !== -1) {
 					return true;
 				}
 				var style = (el.getAttribute('style') || '').toLowerCase();
@@ -3916,17 +4349,24 @@ function wd_fix_order_pay_overlay_issue() {
 			}
 
 			function clearOverlay() {
+				if (!document.body) {
+					return;
+				}
 				document.querySelectorAll('.blockOverlay, .blockUI').forEach(function (el) {
-					el.remove();
+					if (el && el.parentNode) {
+						el.remove();
+					}
 				});
 				document.querySelectorAll('body.woocommerce-order-pay *').forEach(function (el) {
-					if (isLikelyOverlay(el)) {
+					if (el && isLikelyOverlay(el) && el.parentNode) {
 						el.remove();
 					}
 				});
 				document.querySelectorAll('form.checkout.processing, form.processing, .processing').forEach(function (el) {
-					el.classList.remove('processing');
-					el.style.removeProperty('position');
+					if (el && el.classList) {
+						el.classList.remove('processing');
+						el.style.removeProperty('position');
+					}
 				});
 				document.body.classList.remove('processing');
 				document.body.style.overflow = 'auto';

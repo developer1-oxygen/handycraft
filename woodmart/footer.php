@@ -15,6 +15,12 @@
 		$disable_prefooter = get_post_meta( $page_id, '_woodmart_prefooter_off', true );
 		$disable_footer_page = get_post_meta( $page_id, '_woodmart_footer_off', true );
 		$disable_copyrights_page = get_post_meta( $page_id, '_woodmart_copyrights_off', true );
+		// Home: same footer widgets/copyrights as shop (ignore per-page disable flags on front page).
+		if ( is_front_page() ) {
+			$disable_prefooter       = false;
+			$disable_footer_page     = false;
+			$disable_copyrights_page = false;
+		}
 	?>
 	<?php if ( ! $disable_prefooter && woodmart_get_opt( 'prefooter_area' ) ): ?>
 		<div class="woodmart-prefooter">
