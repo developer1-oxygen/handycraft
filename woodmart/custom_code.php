@@ -8,6 +8,42 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * Site logo when Woodmart Header Builder has no logo image (desktop + mobile header rows).
+ *
+ * @return string Logo URL.
+ */
+function wd_get_site_logo_url() {
+	static $cached = null;
+
+	if ( null !== $cached ) {
+		return $cached;
+	}
+
+	if ( defined( 'WD_SITE_LOGO_URL' ) && WD_SITE_LOGO_URL ) {
+		$cached = WD_SITE_LOGO_URL;
+		return $cached;
+	}
+
+	$upload_rel = '/uploads/2026/03/logo.png';
+	$upload_abs = WP_CONTENT_DIR . $upload_rel;
+
+	if ( file_exists( $upload_abs ) ) {
+		$cached = content_url( $upload_rel );
+		return $cached;
+	}
+
+	$theme_logo_path = get_theme_file_path( 'custom/images/logo.png' );
+	if ( file_exists( $theme_logo_path ) ) {
+		$cached = get_theme_file_uri( 'custom/images/logo.png' );
+		return $cached;
+	}
+
+	$cached = apply_filters( 'wd_site_logo_url', WOODMART_IMAGES . '/wood-logo-dark.svg' );
+
+	return $cached;
+}
+
+/**
  * Check whether a product belongs to "Frame" category tree.
  *
  * Matches by slug/name and also supports child categories of Frame.

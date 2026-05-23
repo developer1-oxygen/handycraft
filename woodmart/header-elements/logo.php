@@ -1,6 +1,8 @@
 <?php
-// Get the logo
-$logo 		= WOODMART_IMAGES . '/wood-logo-dark.svg';
+// Get the logo (Header Builder image, then site branding, then Woodmart default).
+$logo = function_exists( 'wd_get_site_logo_url' )
+	? wd_get_site_logo_url()
+	: WOODMART_IMAGES . '/wood-logo-dark.svg';
 
 $protocol = woodmart_http() . "://";
 
@@ -14,6 +16,11 @@ if(isset($params['image']['id']) && $params['image']['id'] != '') {
 	$attachment = wp_get_attachment_image_src( $params['image']['id'], 'full' );
 	if( isset( $attachment[0] ) && ! empty( $attachment[0] ) )
 		$logo = $attachment[0];
+}
+
+// Replace Woodmart placeholder logos with site branding (common on mobile header row).
+if ( function_exists( 'wd_get_site_logo_url' ) && preg_match( '/wood-logo-(dark|white)\.svg/i', (string) $logo ) ) {
+	$logo = wd_get_site_logo_url();
 }
 
 $logo = $protocol. str_replace(array('http://', 'https://'), '', $logo);
