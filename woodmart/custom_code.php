@@ -1700,6 +1700,216 @@ function wd_save_wau_product_enable_meta_backup( $post_id ) {
 add_action( 'woocommerce_process_product_meta', 'wd_save_wau_product_enable_meta_backup', 99, 1 );
 
 /**
+ * Whether WAU uploads are enabled for this product.
+ *
+ * @param int $product_id Product ID.
+ * @return bool
+ */
+function wd_product_uses_wau_uploads( $product_id ) {
+	$product_id = absint( $product_id );
+	if ( $product_id <= 0 ) {
+		return false;
+	}
+
+	if ( 'yes' === get_post_meta( $product_id, '_wau_product_enable', true ) ) {
+		return true;
+	}
+
+	$parent_id = wp_get_post_parent_id( $product_id );
+	if ( $parent_id > 0 && 'yes' === get_post_meta( $parent_id, '_wau_product_enable', true ) ) {
+		return true;
+	}
+
+	$settings = get_option( 'wau_addon_settings' );
+	return is_array( $settings ) && isset( $settings['wau_enable_addon'] ) && '1' === $settings['wau_enable_addon'];
+}
+
+/**
+ * Pre-uploaded attachment IDs sent from wd-wau-add-to-cart.js (not $_FILES).
+ *
+ * @return bool
+ */
+function wd_request_has_wau_preupload_ids() {
+	if ( empty( $_POST['wd_wau_preupload_ids'] ) && empty( $_REQUEST['wd_wau_preupload_ids'] ) ) {
+		return false;
+	}
+
+	$raw  = ! empty( $_POST['wd_wau_preupload_ids'] ) ? $_POST['wd_wau_preupload_ids'] : $_REQUEST['wd_wau_preupload_ids'];
+	$ids  = array_filter( array_map( 'absint', (array) wp_unslash( $raw ) ) );
+
+	return ! empty( $ids );
+}
+
+/**
+ * Skip ShortPixel auto-optimize during WAU pre-upload / fast add-to-cart.
+ *
+ * @param bool $skip Skip flag.
+ * @return bool
+ */
+function wd_wau_skip_shortpixel_during_upload( $skip ) {
+	if ( wp_doing_ajax() && isset( $_REQUEST['action'] ) ) {
+		$action = sanitize_key( wp_unslash( $_REQUEST['action'] ) );
+		if ( in_array( $action, array( 'wd_wau_preupload', 'woodmart_ajax_add_to_cart' ), true ) ) {
+			return true;
+		}
+	}
+	return $skip;
+}
+add_filter( 'shortpixel_skip_autoprocess', 'wd_wau_skip_shortpixel_during_upload', 10, 1 );
+
+/**
+ * Compress image on server when client could not (fallback).
+ *
+ * @param string $file_path Absolute file path.
+ * @return string Path to use for attachment (original or new).
+ */
+function wd_wau_server_compress_image( $file_path ) {
+	if ( ! $file_path || ! file_exists( $file_path ) ) {
+		return $file_path;
+	}
+
+	$skip_below = 180000;
+	if ( filesize( $file_path ) <= $skip_below ) {
+		return $file_path;
+	}
+
+	$editor = wp_get_image_editor( $file_path );
+	if ( is_wp_error( $editor ) ) {
+		return $file_path;
+	}
+
+	$size = $editor->get_size();
+	if ( is_wp_error( $size ) || empty( $size['width'] ) || empty( $size['height'] ) ) {
+		return $file_path;
+	}
+
+	$max = 1920;
+	$scale = min( 1, $max / (int) $size['width'], $max / (int) $size['height'] );
+	if ( $scale < 1 ) {
+		$editor->resize(
+			(int) round( $size['width'] * $scale ),
+			(int) round( $size['height'] * $scale ),
+			false
+		);
+	}
+
+	$editor->set_quality( 82 );
+	$saved = $editor->save( $file_path );
+	if ( is_wp_error( $saved ) || empty( $saved['path'] ) ) {
+		return $file_path;
+	}
+
+	return $saved['path'];
+}
+
+/**
+ * AJAX: pre-upload one WAU file (compressed) so add-to-cart stays fast.
+ *
+ * @return void
+ */
+function wd_wau_preupload_handler() {
+	check_ajax_referer( 'wd_wau_preupload', 'nonce' );
+
+	if ( empty( $_FILES['file'] ) || empty( $_FILES['file']['name'] ) ) {
+		wp_send_json_error( array( 'message' => __( 'No file received.', 'woodmart' ) ) );
+	}
+
+	require_once ABSPATH . 'wp-admin/includes/file.php';
+	require_once ABSPATH . 'wp-admin/includes/media.php';
+	require_once ABSPATH . 'wp-admin/includes/image.php';
+
+	$file = $_FILES['file'];
+	if ( ! empty( $file['type'] ) && 0 === strpos( $file['type'], 'image/' ) ) {
+		$uploaded = wp_handle_upload(
+			$file,
+			array(
+				'test_form' => false,
+				'mimes'     => null,
+			)
+		);
+		if ( isset( $uploaded['error'] ) ) {
+			wp_send_json_error( array( 'message' => $uploaded['error'] ) );
+		}
+
+		$final_path = wd_wau_server_compress_image( $uploaded['file'] );
+		$attachment = array(
+			'post_mime_type' => $uploaded['type'],
+			'post_title'     => sanitize_file_name( wp_basename( $final_path ) ),
+			'post_content'   => '',
+			'post_status'    => 'inherit',
+		);
+		$attach_id = wp_insert_attachment( $attachment, $final_path );
+		if ( is_wp_error( $attach_id ) ) {
+			wp_send_json_error( array( 'message' => $attach_id->get_error_message() ) );
+		}
+		wp_update_attachment_metadata( $attach_id, wp_generate_attachment_metadata( $attach_id, $final_path ) );
+	} else {
+		$attach_id = media_handle_upload( 'file', 0 );
+		if ( is_wp_error( $attach_id ) ) {
+			wp_send_json_error( array( 'message' => $attach_id->get_error_message() ) );
+		}
+	}
+
+	$path = get_attached_file( $attach_id );
+	$size = ( $path && file_exists( $path ) ) ? (int) filesize( $path ) : 0;
+
+	wp_send_json_success(
+		array(
+			'id'   => (int) $attach_id,
+			'url'  => wp_get_attachment_url( $attach_id ),
+			'size' => $size,
+		)
+	);
+}
+add_action( 'wp_ajax_wd_wau_preupload', 'wd_wau_preupload_handler' );
+add_action( 'wp_ajax_nopriv_wd_wau_preupload', 'wd_wau_preupload_handler' );
+
+/**
+ * Attach pre-uploaded media IDs to cart (no heavy upload on add-to-cart).
+ *
+ * @param array $cart_item_meta Cart item meta.
+ * @param int   $product_id     Product ID.
+ * @return array
+ */
+function wd_wau_attach_preuploaded_to_cart( $cart_item_meta, $product_id ) {
+	if ( ! wd_request_has_wau_preupload_ids() || ! wd_product_uses_wau_uploads( $product_id ) ) {
+		return $cart_item_meta;
+	}
+
+	$raw = ! empty( $_POST['wd_wau_preupload_ids'] ) ? $_POST['wd_wau_preupload_ids'] : $_REQUEST['wd_wau_preupload_ids'];
+	$ids = array_filter( array_map( 'absint', (array) wp_unslash( $raw ) ) );
+	if ( empty( $ids ) ) {
+		return $cart_item_meta;
+	}
+
+	if ( ! isset( $cart_item_meta['wau_addon_ids'] ) ) {
+		$cart_item_meta['wau_addon_ids'] = array();
+	}
+
+	foreach ( $ids as $attach_id ) {
+		if ( $attach_id <= 0 ) {
+			continue;
+		}
+		$url = wp_get_attachment_url( $attach_id );
+		if ( ! $url ) {
+			continue;
+		}
+		$cart_item_meta['wau_addon_ids'][] = array(
+			'media_id'  => $attach_id,
+			'media_url' => $url,
+		);
+	}
+
+	// Prevent WAU from running media_handle_upload again on the same request.
+	if ( isset( $_FILES['wau_file_addon'] ) ) {
+		unset( $_FILES['wau_file_addon'] );
+	}
+
+	return $cart_item_meta;
+}
+add_filter( 'woocommerce_add_cart_item_data', 'wd_wau_attach_preuploaded_to_cart', 5, 2 );
+
+/**
  * Whether the current request includes a WAU plugin file upload.
  *
  * @return bool
@@ -1763,7 +1973,7 @@ function wd_bypass_wau_mandatory_for_standard_products( $passed, $product_id ) {
 		return $passed;
 	}
 
-	if ( 'yes' !== get_post_meta( $product_id, '_wau_product_enable', true ) ) {
+	if ( ! wd_product_uses_wau_uploads( $product_id ) ) {
 		return $passed;
 	}
 
@@ -1773,8 +1983,13 @@ function wd_bypass_wau_mandatory_for_standard_products( $passed, $product_id ) {
 		return true;
 	}
 
+	// Files already pre-uploaded (compressed) — WAU only checks $_FILES and would fail here.
+	if ( wd_request_has_wau_preupload_ids() ) {
+		wd_clear_wau_file_required_notices();
+		return true;
+	}
+
 	// No files in request (Woodmart serialize / empty upload): allow add to cart without WAU file.
-	// When files are sent via FormData, do not bypass — plugin should attach them to the cart item.
 	if ( ! wd_request_has_wau_file_upload() ) {
 		wd_clear_wau_file_required_notices();
 		return true;
@@ -1782,7 +1997,28 @@ function wd_bypass_wau_mandatory_for_standard_products( $passed, $product_id ) {
 
 	return $passed;
 }
-add_filter( 'woocommerce_add_to_cart_validation', 'wd_bypass_wau_mandatory_for_standard_products', 20, 2 );
+add_filter( 'woocommerce_add_to_cart_validation', 'wd_bypass_wau_mandatory_for_standard_products', 25, 2 );
+
+/**
+ * Clear WAU file-required notice when pre-upload IDs are present (runs after WAU validation).
+ *
+ * @param bool $passed     Validation result.
+ * @param int  $product_id Product ID.
+ * @return bool
+ */
+function wd_wau_validation_accept_preuploads( $passed, $product_id ) {
+	if ( $passed || ! wd_product_uses_wau_uploads( $product_id ) ) {
+		return $passed;
+	}
+
+	if ( wd_request_has_wau_preupload_ids() ) {
+		wd_clear_wau_file_required_notices();
+		return true;
+	}
+
+	return $passed;
+}
+add_filter( 'woocommerce_add_to_cart_validation', 'wd_wau_validation_accept_preuploads', 99, 2 );
 
 /**
  * Ensure product add-to-cart form accepts file uploads (WAU plugin).
@@ -1795,7 +2031,7 @@ function wd_enqueue_wau_multipart_add_to_cart_script() {
 	}
 
 	$product_id = get_queried_object_id();
-	if ( $product_id <= 0 || 'yes' !== get_post_meta( $product_id, '_wau_product_enable', true ) ) {
+	if ( $product_id <= 0 || ! wd_product_uses_wau_uploads( $product_id ) ) {
 		return;
 	}
 
@@ -1809,6 +2045,29 @@ function wd_enqueue_wau_multipart_add_to_cart_script() {
 		array( 'jquery' ),
 		$version,
 		true
+	);
+
+	wp_localize_script(
+		'wd-wau-add-to-cart',
+		'wdWauCompress',
+		array(
+			'ajaxurl'          => admin_url( 'admin-ajax.php' ),
+			'nonce'            => wp_create_nonce( 'wd_wau_preupload' ),
+			'maxWidth'         => 1920,
+			'maxHeight'        => 1920,
+			'quality'          => 0.82,
+			'minQuality'       => 0.55,
+			'targetMaxBytes'   => 450000,
+			'skipBelowBytes'   => 180000,
+			'i18n'             => array(
+				'optimizing'     => __( 'Optimizing image…', 'woodmart' ),
+				'uploading'      => __( 'Uploading to server…', 'woodmart' ),
+				'ready'          => __( 'Upload complete', 'woodmart' ),
+				'error'          => __( 'Upload failed — please try again', 'woodmart' ),
+				'waiting'        => __( 'Please wait for uploads to finish', 'woodmart' ),
+				'filesUploaded'  => __( 'files uploaded', 'woodmart' ),
+			),
+		)
 	);
 }
 add_action( 'wp_enqueue_scripts', 'wd_enqueue_wau_multipart_add_to_cart_script', 10050 );
